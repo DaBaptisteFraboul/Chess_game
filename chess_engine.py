@@ -2,7 +2,19 @@ import pygame
 import math
 # import images in variables
 
+# TODO: Attention à ton utilisation des modules python.
+#  Tu déclares beaucoup de chose au chargement des modules.
+#  Ce module ne devrait contenir que les  classes et fonctions relatives au
+#  fonctionnement (abstrait) du jeu d'échec. Hors tu charges aussi les images
+#  pour pygame. Mets tout ce qui est relatif à pygame dans un autre module.
 
+
+# TODO: Attention à ta nomenclature. On retrouve des méthodes ou attributs
+#  nommées Get_Function, d'autres get_function, d'autres get_FUNCTIONS.
+#  En python, La convention c'est PEP8: https://www.python.org/dev/peps/pep-0008/
+
+
+# TODO: Ces trois lignes s'exécute lors de l'import. C'est pas top.
 Images = {}
 image_overlay = pygame.image.load("assets/board/export/valid_move_text.png")
 board_offset = (64, 128)
@@ -27,6 +39,8 @@ def load_pieces_images() :
         Images[piece] = pygame.transform.scale(Images[piece], (64,64))
 load_pieces_images()
 
+
+# TODO: Ça, ça devrait être dans un module pour les constantes.
 starting_position = [
     ['black_rock', 'black_knight','black_bishop', 'black_queen','black_king', 'black_bishop','black_knight', 'black_rock'],
     ['black_pawn','black_pawn','black_pawn','black_pawn','black_pawn','black_pawn','black_pawn','black_pawn',],
@@ -43,6 +57,8 @@ class ChessBoard() :
     def __init__(self):
         self.image = pygame.image.load("assets/board/export/chessboard_tex.png")
         self.rect = self.image.get_rect()
+        # TODO: self.board = [["Empty"] * 8] * 8
+        #  ça ferait la même chose
         self.board = [
     ["Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty"],
     ["Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty", "Empty"],
@@ -102,10 +118,10 @@ class ChessBoard() :
         if colour == "black" :
             return 'white'
 
-    def draw(self,screen):
+    def draw(self,screen):  # TODO: draw what? le board j'imagine? Appelle cette méthode draw_board
         screen.blit(self.image, self.rect)
 
-    def draw_moves(self, screen, moves, square):
+    def draw_moves(self, screen, moves, square):  # TODO: Là c'est bon. :)
         piece = self.board[square[0]][square[1]] #piece selectionée
         for move in moves : #pour les moves dans les moves valids
             if move.start_row == square[0] and move.start_col == square[1] and \
@@ -113,7 +129,7 @@ class ChessBoard() :
                 screen.blit(image_overlay, pygame.Rect(move.end_col*64 + board_offset[0],move.end_row*64 + board_offset[1],64,64))
 
 
-    def draw_pieces(self, screen):
+    def draw_pieces(self, screen):  # TODO: Là aussi. :)
         for row in range(8) :
             for col in range(8) :
                 screen_pos = (col , row)
@@ -123,7 +139,7 @@ class ChessBoard() :
     def get_piece_type(self, piece_square):
         piece = self.board[piece_square[0]][piece_square[1]]
         if piece != 'Empty' :
-            type = piece.split('_')[1]
+            type = piece.split('_')[1]  # TODO: attention, type c'est un mot réservé python. Il ne faut pas le redéfinir sous peine de surprise.
             return type
         else :
             return 'Empty'

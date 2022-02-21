@@ -36,7 +36,7 @@ class Game() :
     def __init__(self):
 
 
-        self.author = "Baptiste Fraboul"
+        self.author = "Baptiste Fraboul"  # TODO: tu utilises jamais cette variable. C'est à retirer à mon avis.
         self.name = "Chess "
         self.window_size = (704,768)
         self.window = pygame.display.set_mode(self.window_size)
@@ -72,6 +72,10 @@ class Game() :
         pygame.mouse.set_cursor(pygame.cursors.diamond)
 
     def final_screen(self):
+        # TODO: c'est une méthode (ie un truc qui fait quelque chose) mais son
+        #  nom ne dit rien sur ce qu'elle fait. Ça devrait pas plutôt s'appeler
+        #  display_game_end_screen? J'ai été obligé de lire le contenu de la
+        #  fonction pour comprendre ce qu'elle fait.
         running = True
         window = pygame.display.set_mode(self.window_size)
         message_rect = pygame.Rect((10,256),(64, 256))
@@ -89,6 +93,7 @@ class Game() :
             window.blit(message,message_rect)
 
     def inside_board (self,x, y) :
+        # TODO: Ça devrait plutôt s'appeler is_inside_board non?
         if 64 <= x <= 576 and 128 <= y <= 640 :
             return True
         else :
@@ -97,6 +102,7 @@ class Game() :
     Permet la gestion dela boucle d'events, tout ce qui est input du joueur est géré ici
     '''
     def click_handling(self, event):
+        # TODO: Ça devrait plutôt s'appeler handle_click_event non?
         """
         gestion des clics de la souris
         """
@@ -148,12 +154,16 @@ class Game() :
 
 
     def events(self):
+        # TODO: Ça devrait plutôt s'appeler handle_events. Là juste events,
+        #  c'est pas clair.
 
         self.right_clicking = False
         self.mx, self.my = pygame.mouse.get_pos()
         for event in pygame.event.get() :
             if event.type == pygame.QUIT :
                 self.running = False
+                # TODO: pourquoi un sys.exit() et pas juste un return? Là tu
+                #  forces python à s'arrêter.
                 sys.exit()
 
             if event.type == pygame.KEYDOWN :
@@ -196,7 +206,8 @@ class Game() :
         if self.board.checkmate or self.board.pat :
             self.running = False
             sys.exit()
-            self.final_screen()
+            self.final_screen()  # TODO: Cette fonction sera jamais appeler.
+            # Pareil pas besoin d'un sys.exit ici.
 
 
         pygame.display.flip()
@@ -210,6 +221,10 @@ class Game() :
             self.display()
             self.clock.tick(60)
 
+# TODO: tu devrais mettre ça dans un main:
+#  if __name__ == "__main__":
+#      test = Game()
+#      test.run()
 
 test = Game()
 test.run()
