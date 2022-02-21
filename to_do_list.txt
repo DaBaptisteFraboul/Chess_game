@@ -1,0 +1,29 @@
+Il y a un problème de fond lors de la génération des moves de type Roque,
+la génération des roques a été mise dans
+Generate all possible moves
+pour  générer le move je fais appel à la fonction square_under_attack
+square_under_attack genère tous les moves de l'adversaire, *
+dont les roques
+
+etc. Boucle infinie,
+
+Je dois retirer les moves de roque lors de la génération des moves de l'adversaire dans la fonction square_undezr_attack,
+en effet le roque est un move particulier car il ne peut pas se solder par une prise.
+
+Je dois encore rajouter la promotion des pions lorsqu'ils atteignent la dernière rangée
+
+Repenser la génération des roques, il faut  être  plus simple et intelliggent
+
+
+pour la promotion :
+    lorsque le pion atteint la dernière colonne :
+          Afficher 4 pièces sur l'écran Dame // Tour // Fou //  Cavalier.
+          Le jeu est en pause tant que la pièce n'as pas été selectionnée (Faire une )
+          promotion = None
+          while promotion == None :
+            screen.blit(Imagesetc).
+            click_down = eve,t
+            self.mx, my = pygame.mouse.getpos()
+            rect.collidepoint (mx, my) and click down
+                promotion = piece
+                self.board[][] postion du pion = self.colour_to_play + '_' + piece

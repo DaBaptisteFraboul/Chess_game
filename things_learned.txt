@@ -1,0 +1,2 @@
+Attention à la différence entre tuples et list, ce sont des objects distinct on ne peut pas les comparer directemetn.
+Il faut être cohérent sur la façon dont on utilise les types de variables.
