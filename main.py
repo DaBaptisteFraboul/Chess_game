@@ -3,7 +3,11 @@ import pygame
 import chess_engine
 import sys, time
 
+"""
+Je vais suremetn faire un fichier constant.py pour initialiser les modules pygames et loger les variables constantes
+que je ne sais pas où placer
 
+"""
 pygame.font.init()
 board_offset = (64, 128)
 board_position= (576, 640 )
@@ -26,10 +30,12 @@ class Framerate_exemple():
         self.clock.get_fps()
 
 
-
+#Taille finale de l'application (704,768), taille de l'échiquier (512,512)
 class Game() :
     """
-    Taille finale de l'application (704,768), taille de l'échiquier (512,512)
+    Cette classe contient l'affichage de la partie d'échecs
+    Je dois encore clarifier comment le faire proprement, pour l'instant il s'agit également de la gestion de l'application
+
 
 
     """
@@ -72,6 +78,12 @@ class Game() :
         pygame.mouse.set_cursor(pygame.cursors.diamond)
 
     def final_screen(self):
+        """
+        Unused To replace, doesnt work, I must understand to display font in pygame before trying to implement it into
+        my application ofc.
+
+        :return:
+        """
         running = True
         window = pygame.display.set_mode(self.window_size)
         message_rect = pygame.Rect((10,256),(64, 256))
@@ -84,12 +96,19 @@ class Game() :
         while running :
             for event in pygame.event.get():
                 if event.type == pygame.K_ESCAPE :
-                    running = False
+
                     sys.exit()
             window.blit(message,message_rect)
 
     def inside_board (self,x, y) :
-        if 64 <= x <= 576 and 128 <= y <= 640 :
+        """
+        Cette méthode permet de vérifier si le les coordonées x et y sont bien dans l'échiquier par
+        rapport à l'UI de l'application
+        :param x:
+        :param y:
+        :return:
+        """
+        if 64 < x < 576 and 128 < y < 640 :
             return True
         else :
             return False
@@ -183,7 +202,8 @@ class Game() :
 
     def display(self):
         """
-        couleur du fond par défaut, gris Ensi
+        Gère l'affichage des éléments à l'écran, notez bien que l'ordre des commandes correspond à l'ordre,
+        arrière plan / premier plan
         """
         self.window.fill(self.default_color)
 
@@ -194,9 +214,8 @@ class Game() :
         if self.player_clicks != [] :
             self.board.draw_moves(self.window,self.Valid_moves,self.player_clicks[0])
         if self.board.checkmate or self.board.pat :
-            self.running = False
-            sys.exit()
-            self.final_screen()
+            print("End")
+
 
 
         pygame.display.flip()
@@ -204,6 +223,11 @@ class Game() :
 
 
     def run(self):
+        """
+        Fait tourner l'application
+
+        :return:
+        """
         while self.running :
             self.events()
             self.update()

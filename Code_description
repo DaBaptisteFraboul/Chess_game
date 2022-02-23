@@ -1,0 +1,11 @@
+Fonctionnement du chess engine :
+
+L'échiquier est une double liste : il contient 8 listes de huits élements, 8 lignes de 8 cases (colonnes)
+
+Le board est une classe qui contient une variable échiquier (double liste), cette double liste est la photographie instannée
+du positionement des pièce, elle sert de base au dessin des pièce par pygame, à l'interaction avec les règles d'échecs.
+
+Les méthodes de la classe board :
+    1) Méthodes utilitaires : méthode qui permettent d'éviter la redondance du code ex(changer la couleur qui joue)
+    2) Méthodes d'affichage : elles ont toutes en input l'écran sur lequel pygame va dessiner les données
+    3) Methodes Règles d'échecs : Règles du jeu et intéraction avec l'échiquier.
