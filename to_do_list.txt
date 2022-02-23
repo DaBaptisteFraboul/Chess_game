@@ -27,3 +27,5 @@ pour la promotion :
             rect.collidepoint (mx, my) and click down
                 promotion = piece
                 self.board[][] postion du pion = self.colour_to_play + '_' + piece
+
+Il faut modifier la manière dont je gère les échecs, je dois clarifier le code

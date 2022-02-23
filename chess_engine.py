@@ -202,6 +202,14 @@ class ChessBoard() :
         return moves
 
     def get_all_moves_without_Roque(self, player_colour) :
+        '''
+        Génération de tous les coups dans les roques pour éviter les boucles infinies
+
+        Cette fonction dpoit sûrement disparaître
+
+        :param player_colour:
+        :return:
+        '''
         moves = []
         for rows in range(len(self.board)):  # Pour tout ligne
             for c in range(len(self.board[rows])):  # pour toute col in ligne
@@ -237,6 +245,13 @@ class ChessBoard() :
 
 
     def square_under_attack(self, r ,c, color):
+        '''
+        Cette méthode permet de vérifier si la case position (r,c) est sous l'attaque de la couleur inverse de colour
+        :param r:
+        :param c:
+        :param color:
+        :return:
+        '''
         op_color = self.opponent_colour(color)
         opponent_moves = self.get_all_moves_without_Roque(op_color)
         for move in opponent_moves :
@@ -248,6 +263,17 @@ class ChessBoard() :
 
 
     def get_Valid_moves(self, colour):
+        '''
+        Valid move est la méthode de génération des moves définitifs, elle sert de relation entre la méthode naive de génération
+        des coups simples et les règles plus complexes (échecs, clouage) qui impliquent le Roi
+
+        Elle prend en input la couleur qui doit jouer et fait appels aux fonctions :
+        self.get_all_possible_moves(colour)
+        self.check_for_pins_and_check(colour)
+
+        :param colour:
+        :return:
+        '''
         legal_moves = []
         if colour == 'white'  :
             king_loc = self.white_king_location
@@ -256,6 +282,9 @@ class ChessBoard() :
         self.inCheck, self.clouage, self.checks = self.check_for_pins_and_checks(colour)
         if self.inCheck :# nous sommes en echec/ nous allons générer les réponses à l'échec
             print(len(self.checks))
+            '''
+            Pour chaque echec (case + direction), générons les réopnses possible
+            '''
             if len(self.checks) == 1 :
                 legal_moves = self.get_all_possibles_moves(colour)
                 check = self.checks[0]
@@ -280,31 +309,20 @@ class ChessBoard() :
                     if self.get_piece_type([legal_moves[i].start_row, legal_moves[i].start_col]) != 'king' : #si le move n'est pas un move du roi alors il doit bloquer ou manger la pièce, finir sur une valid square
                         if not (legal_moves[i].end_row, legal_moves[i].end_col) in self.valid_squares :
                             legal_moves.remove(legal_moves[i])
-                    elif self.get_piece_type([legal_moves[i].start_row, legal_moves[i].start_col]) == 'king' :# enlève tous les moves du roi qui finissent sur les cases en echec
-                        if (legal_moves[i].end_row, legal_moves[i].end_col) in self.valid_squares :
-                            legal_moves.remove(legal_moves[i])
+
             else :  # double ou triple echecs on ne peut bloquer les pièce il faut boueger le roi
                 legal_moves =self.get_King_moves(king_loc[0], king_loc[1], legal_moves, colour)
             pass
         else: #nous ne sommes pas en echecs nous pouvons analyser les moves possibles
             legal_moves = self.get_all_possibles_moves(colour) # on génère une fois tous les moves possibles
-        """
-        Pour vérifer que le roi ne se mette pas volontairement en échecs, il faut faire chaque move du Roi
-        (on peut se le permettre c'est que 8 moves max)
-        """
-        for move in legal_moves :
-            if self.get_piece_type([move.start_row, move.start_col]) == 'king' :
-                print([move.start_row, move.start_col])
-                if self.square_under_attack(move.end_row,move.end_col, self.colour_to_play) :
-                    legal_moves.remove(move)
+
         if len(legal_moves) == 0 :
             if self.inCheck :
                 self.checkmate = True
             else :
                 self.pat = True
-
-
         return legal_moves
+
 
     # cet algorithme plus élégant ne recalcule plus tous le coups de l'adversaire pour voir si le roi est en echecs en traquant sa position
     # mais il part de la position du roi pour savoir si une pièce ennemi peut l'attaquer
@@ -601,16 +619,41 @@ class ChessBoard() :
                         break
 
     def get_King_moves(self, r, c, moves, colour):
+        """
+        On retourne les moves du Roi, c'est ici que l'on vérifie que le Roi ne se met pas en échecs
+        en mangeant une pièce. cela se fait en utilisant la méthode self.chec_for_pins_and_checks(colour)
+        du board
+        :param r:
+        :param c:
+        :param moves:
+        :param colour:
+        :return:
+        """
+
         directions = ((0, -1), (0, +1), (+1, 0), (-1, 0),
                       (-1, -1), (-1, +1), (+1, -1), (+1, +1))
         for d in directions:
             end_col = c + d[1]
             end_row = r + d[0]
             if 0 <= end_row <8 and 0 <= end_col < 8 :
-                if self.board[end_row][end_col] == 'Empty' :
-                    moves.append(Moves([r,c],[end_row,end_col], self.board))
-                elif self.get_piece_colour([end_row,end_col]) != colour :
-                    moves.append(Moves([r,c],[end_row,end_col], self.board))
+                if self.get_piece_colour([end_row,end_col]) != colour or self.board[end_row][end_col] == 'Empty':
+                    """
+                    Update king location to check for checks
+                    """
+                    if colour == 'white' :
+                        self.white_king_location = [end_row, end_col]
+                    else :
+                        self.black_king_location = [end_row, end_col]
+                    in_check, clouage, echecs = self.check_for_pins_and_checks(colour)
+                    if not in_check :
+                        moves.append(Moves([r,c],[end_row,end_col], self.board))
+                    """
+                    Reset king location to previous (r,c)
+                    """
+                    if colour == 'white' :
+                        self.white_king_location = [r,c]
+                    else :
+                        self.black_king_location = [r,c]
                 else :
                     pass
             else :
