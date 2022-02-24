@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pygame
 import math
 # import images in variables
@@ -9,6 +10,7 @@ board_offset = (64, 128)
 
 
 def load_pieces_images() :
+
     pieces = ['black_pawn',
               'black_king',
               'black_queen',
@@ -22,9 +24,12 @@ def load_pieces_images() :
               'white_queen',
               'white_king',
               'Empty']
+
     for piece in pieces :
         Images[piece] = pygame.image.load("assets/board/export/pieces/02/" + piece + ".png")
         Images[piece] = pygame.transform.scale(Images[piece], (64,64))
+
+
 load_pieces_images()
 
 starting_position = [
@@ -39,7 +44,7 @@ starting_position = [
      'white_rock']
 ]
 
-class ChessBoard() :
+class ChessBoard :
     def __init__(self):
         self.image = pygame.image.load("assets/board/export/chessboard_tex.png")
         self.rect = self.image.get_rect()

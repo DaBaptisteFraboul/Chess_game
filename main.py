@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import math
 import pygame
 import chess_engine
@@ -6,14 +8,13 @@ import sys, time
 """
 Je vais suremetn faire un fichier constant.py pour initialiser les modules pygames et loger les variables constantes
 que je ne sais pas où placer
-
 """
 pygame.font.init()
 board_offset = (64, 128)
 board_position= (576, 640 )
 print(board_position)
 FPS = 60
-class Framerate_exemple():
+class FramerateExample:
     def __init__(self):
         self.previousTime = time.time()
         """
@@ -31,7 +32,7 @@ class Framerate_exemple():
 
 
 #Taille finale de l'application (704,768), taille de l'échiquier (512,512)
-class Game() :
+class Game :
     """
     Cette classe contient l'affichage de la partie d'échecs
     Je dois encore clarifier comment le faire proprement, pour l'instant il s'agit également de la gestion de l'application
