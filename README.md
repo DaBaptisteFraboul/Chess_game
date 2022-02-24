@@ -53,5 +53,5 @@ Roadmap of implementations to make :
       ⬜ Sending moves using network
       ⬜ Receiving moves throught network
    
-Thx to Paul-Emile for teaching me so much about computers, sofware and programation.
+Thx to Paul-Émile for teaching me so much about computers, sofware and programation.
     
