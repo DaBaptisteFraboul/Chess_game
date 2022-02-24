@@ -4,16 +4,9 @@ import math
 import pygame
 import chess_engine
 import sys, time
+import constants
 
-"""
-Je vais suremetn faire un fichier constant.py pour initialiser les modules pygames et loger les variables constantes
-que je ne sais pas où placer
-"""
-pygame.font.init()
-board_offset = (64, 128)
-board_position= (576, 640 )
-print(board_position)
-FPS = 60
+
 class FramerateExample:
     def __init__(self):
         self.previousTime = time.time()
@@ -41,42 +34,32 @@ class Game :
 
     """
     def __init__(self):
-
-
-        self.author = "Baptiste Fraboul"
-        self.name = "Chess "
+        # classic pygame stuff
         self.window_size = (704,768)
         self.window = pygame.display.set_mode(self.window_size)
         pygame.display.set_caption("Chess game!")
         self.running = True
         self.clock = pygame.time.Clock()
-        """
-        Font section
-        """
-        self.Arial_font = pygame.font.Font('fonts/ARIALN.TTF',16)
-
-
-        """
-        Pygame.Color section
-        """
-        self.default_color = pygame.Color((61,61,61))
-        self.error_color = pygame.Color((136,0,21))
 
         self.board = chess_engine.ChessBoard()
         self.board.set_starting_position()
 
         # gestion des moves légaux
         self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
-        self.move_made = False # Pour éviter de regénérer tous les moves à chaque frame, regénéer les nouveaux valid_move lorsque le move a été fait
+        self.move_made = False #variable used to avoid to recalculate moves every frames
+
+        # Mouse related variables
 
         self.right_clicking = False
         self.mx , self.my = pygame.mouse.get_pos()
-
-        # self.clicks contient une paire de case à comparer pour générer les coups d'échecs
-
         self.player_clicks = []
         self.selected_case = ()
+
         pygame.mouse.set_cursor(pygame.cursors.diamond)
+
+        # for debugging purpose :
+
+        self.god_mod = False
 
     def final_screen(self):
         """
@@ -93,15 +76,14 @@ class Game :
         if self.board.checkmate :
             winner = self.board.opponent_colour(self.board.colour_to_play)
             text = winner + " have won the game by checkmate"
-        message = self.Arial_font.render(text,True,'Red',(0,0,0))
+        message = constants.Arial_font.render(text, True, 'Red', (0, 0, 0))
         while running :
             for event in pygame.event.get():
                 if event.type == pygame.K_ESCAPE :
-
                     sys.exit()
             window.blit(message,message_rect)
 
-    def inside_board (self,x, y) :
+    def is_inside_board (self, x, y) :
         """
         Cette méthode permet de vérifier si le les coordonées x et y sont bien dans l'échiquier par
         rapport à l'UI de l'application
@@ -116,7 +98,7 @@ class Game :
     '''
     Permet la gestion dela boucle d'events, tout ce qui est input du joueur est géré ici
     '''
-    def click_handling(self, event):
+    def handle_click_event(self, event):
         """
         gestion des clics de la souris
         """
@@ -124,7 +106,7 @@ class Game :
         if event.type == pygame.MOUSEBUTTONDOWN:
             # clic droit détecté
             #on vérifie que le click est bien sur le board de l'échiquier
-            if self.inside_board(self.mx, self.my) :
+            if self.is_inside_board(self.mx, self.my) :
                 if event.button == 1:
                     location = ((self.my - 128)// 64,
                                 (self.mx - 64)// 64)  # on récupère la position du clic sur le board (attention il faut inverser c et r)
@@ -142,8 +124,10 @@ class Game :
                     if len(self.player_clicks) == 2:  # nous sommes après le deuxième clic
                         if self.board.get_piece_colour(self.player_clicks[0]) == self.board.colour_to_play:
 
-                            move = chess_engine.Moves(self.player_clicks[0], self.player_clicks[1], self.board.board)
-
+                            move = chess_engine.Move(self.player_clicks[0], self.player_clicks[1], self.board.board)
+                            if self.board.get_piece_type(self.player_clicks[0]) == 'king' and\
+                                self.player_clicks[0][1] - self.player_clicks[1][1] != 1 :
+                                    move.is_roque = True
                             if move in self.Valid_moves:
                                 self.board.Make_Move(move)
                                 self.move_made = True
@@ -161,7 +145,13 @@ class Game :
                             self.selected_case = ()
 
                 if self.move_made:
+                    # while god_mode, u skip opponent turn
+                    if self.god_mod :
+                        self.board.next_color()
                     self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
+                    for move in self.Valid_moves :
+                        if move.is_roque :
+                            print("OK")
                     self.move_made = False
             else :
                 print("Outside gameboard")
@@ -183,12 +173,24 @@ class Game :
 
                 if event.key == pygame.K_a :
                     self.board.Undo_Move()
+                    if self.god_mod :
+                        self.board.next_color()
                     self.Valid_moves= self.board.get_Valid_moves(self.board.colour_to_play)
 
                 if event.key == pygame.K_b :
                     self.board.get_Valid_moves(self.board.colour_to_play)
 
-            self.click_handling(event)
+                if event.key == pygame.K_w :
+                    if self.god_mod :
+                        self.god_mod = False
+                    else :
+                        self.god_mod = True
+
+                if event.key == pygame.K_x :
+                    for moves in self.Valid_moves:
+                        print(moves.is_roque)
+
+            self.handle_click_event(event)
 
 
     '''
@@ -206,16 +208,22 @@ class Game :
         Gère l'affichage des éléments à l'écran, notez bien que l'ordre des commandes correspond à l'ordre,
         arrière plan / premier plan
         """
-        self.window.fill(self.default_color)
-
+        self.window.fill(constants.default_color)
         self.window.blit(pygame.image.load("assets/board/export/Application_bg.png"),(0,0))
-        self.board.draw(self.window)
+        self.board.draw_board(self.window)
         self.board.draw_pieces(self.window)
 
         if self.player_clicks != [] :
             self.board.draw_moves(self.window,self.Valid_moves,self.player_clicks[0])
+
         if self.board.checkmate or self.board.pat :
-            print("End")
+            if self.board.checkmate :
+                print("Chekmate" + self.board.colour_to_play + " have lost the game")
+
+            if self.board.pat :
+                print("Pat - Partie Nulle-")
+
+            # On mettra ici le déclencheement de l'animation de victoire et du menu rejouer.
 
 
 
@@ -233,8 +241,8 @@ class Game :
             self.events()
             self.update()
             self.display()
-            self.clock.tick(60)
+            self.clock.tick(constants.FPS)
 
-
-test = Game()
-test.run()
+if __name__ == '__main__' :
+    test = Game()
+    test.run()
