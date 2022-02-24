@@ -7,10 +7,6 @@ import sys, time
 import constants
 
 
-
-
-
-
 class FramerateExample:
     def __init__(self):
         self.previousTime = time.time()
@@ -38,9 +34,7 @@ class Game :
 
     """
     def __init__(self):
-
-
-
+        # classic pygame stuff
         self.window_size = (704,768)
         self.window = pygame.display.set_mode(self.window_size)
         pygame.display.set_caption("Chess game!")
@@ -52,16 +46,20 @@ class Game :
 
         # gestion des moves légaux
         self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
-        self.move_made = False # Pour éviter de regénérer tous les moves à chaque frame, regénéer les nouveaux valid_move lorsque le move a été fait
+        self.move_made = False #variable used to avoid to recalculate moves every frames
+
+        # Mouse related variables
 
         self.right_clicking = False
         self.mx , self.my = pygame.mouse.get_pos()
-
-        # self.clicks contient une paire de case à comparer pour générer les coups d'échecs
-
         self.player_clicks = []
         self.selected_case = ()
+
         pygame.mouse.set_cursor(pygame.cursors.diamond)
+
+        # for debugging purpose :
+
+        self.god_mod = False
 
     def final_screen(self):
         """
@@ -126,8 +124,10 @@ class Game :
                     if len(self.player_clicks) == 2:  # nous sommes après le deuxième clic
                         if self.board.get_piece_colour(self.player_clicks[0]) == self.board.colour_to_play:
 
-                            move = chess_engine.Moves(self.player_clicks[0], self.player_clicks[1], self.board.board)
-
+                            move = chess_engine.Move(self.player_clicks[0], self.player_clicks[1], self.board.board)
+                            if self.board.get_piece_type(self.player_clicks[0]) == 'king' and\
+                                self.player_clicks[0][1] - self.player_clicks[1][1] != 1 :
+                                    move.is_roque = True
                             if move in self.Valid_moves:
                                 self.board.Make_Move(move)
                                 self.move_made = True
@@ -145,7 +145,13 @@ class Game :
                             self.selected_case = ()
 
                 if self.move_made:
+                    # while god_mode, u skip opponent turn
+                    if self.god_mod :
+                        self.board.next_color()
                     self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
+                    for move in self.Valid_moves :
+                        if move.is_roque :
+                            print("OK")
                     self.move_made = False
             else :
                 print("Outside gameboard")
@@ -171,6 +177,16 @@ class Game :
 
                 if event.key == pygame.K_b :
                     self.board.get_Valid_moves(self.board.colour_to_play)
+
+                if event.key == pygame.K_w :
+                    if self.god_mod :
+                        self.god_mod = False
+                    else :
+                        self.god_mod = True
+
+                if event.key == pygame.K_x :
+                    for moves in self.Valid_moves:
+                        print(moves.is_roque)
 
             self.handle_click_event(event)
 

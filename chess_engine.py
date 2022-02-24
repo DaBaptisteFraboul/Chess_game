@@ -96,6 +96,9 @@ class ChessBoard:
                 screen.blit(constants.Images[piece], rect)
 
     def get_piece_type(self, piece_square):
+        '''
+        Get the piece of selected square
+        '''
         piece = self.board[piece_square[0]][piece_square[1]]
         if piece != 'EmptySquare':
             type = piece.split('_')[1]
@@ -112,6 +115,7 @@ class ChessBoard:
         self.board = constants.starting_position
 
     def Make_Move(self, move):
+        #Classic Move
 
         self.board[move.end_row][move.end_col] = move.moved_piece  # on change la pièce d'arrivée
         self.board[move.start_row][move.start_col] = "EmptySquare"  # la case de la pièce de départ devient vide
@@ -119,7 +123,6 @@ class ChessBoard:
             self.white_king_location = [move.end_row, move.end_col]
         if move.moved_piece == 'black_king':
             self.black_king_location = [move.end_row, move.end_col]
-        print (move.is_roque, move.roque_type)
         """
         Résumé du problème:
         J'ai généré un move avec la variable is_roque == True:
@@ -129,27 +132,26 @@ class ChessBoard:
         2) la placer de l'autre côté du Roi 
         """
         if move.is_roque == True:
-            print("roque ongoing")
             tower_row = None
             tower_col = None
             tower_colour = None
             # On détermine la rangée de la tour
-            if self.get_piece_colour(move.moved_piece) == 'white':
+            if move.moved_piece == 'white_king':
                 tower_row = 7
                 tower_colour = 'white'
             else:
                 tower_row = 0
                 tower_colour = 'black'
             # On détermine la tour à bouger / le type de roque
-            if move.roque_type == 'Grand Roque':
+            if move.end_col == 2 :
                 print('grand roque')
                 tower_col = 0
-                self.board[move.start_row][move.start_row + 1] = tower_colour + '_rock'
+                self.board[move.start_row][move.end_col + 1] = tower_colour + '_rock'
                 self.board[tower_row][tower_col] = 'EmptySquare'
-            if move.roque_type == 'Petit Roque' :
+            if move.end_col == 6 :
                 print('petit roque')
                 tower_col = 7
-                self.board[move.start_row][move.start_row - 1] = tower_colour + '_rock'
+                self.board[move.start_row][move.end_col- 1] = tower_colour + '_rock'
                 self.board[tower_row][tower_col] = 'EmptySquare'
 
         # Mettre à jour les droits de Roques
@@ -206,6 +208,10 @@ class ChessBoard:
                         self.get_Roque_Moves(rows, c, moves, colour)
                 else:
                     pass
+
+        for move in moves :
+            if move.is_roque :
+                print("Transfered roque")
 
         return moves
 
@@ -322,6 +328,8 @@ class ChessBoard:
                 self.checkmate = True
             else:
                 self.pat = True
+
+
         return legal_moves
 
     # cet algorithme plus élégant ne recalcule plus tous le coups de l'adversaire pour voir si le roi est en echecs en traquant sa position
@@ -397,7 +405,7 @@ class ChessBoard:
                     break
         return incheck, clouage, echecs
 
-    def get_Roque_Moves(self, r, c, move, colour):
+    def get_Roque_Moves(self, r, c, moves, colour):
         '''
         Un Roque est un Move constitué de deux moves
         1) le roi se déplace de deux cases vers la Tour si aucune des case n'est en échec
@@ -412,9 +420,9 @@ class ChessBoard:
                     if not (self.square_under_attack([r], [c - 1], self.colour_to_play) and
                             self.square_under_attack([r], [c], self.colour_to_play)):
 
-                        grand_roque = Moves([r, c], [r, c - 2], self.board,True)
-                        grand_roque.set_roque_type('Grand Roque')
-                        move.append(grand_roque)
+                        grand_roque = Move([r, c], [r, c - 2], self.board, is_roque= True)
+
+                        moves.append(grand_roque)
                         print('move appended')
 
             if self.current_roques_autorisation.white_petit_roque:
@@ -424,10 +432,9 @@ class ChessBoard:
                     if not (self.square_under_attack([r],[c + 1], self.colour_to_play) and
                             self.square_under_attack([r],[c],self.colour_to_play)):
 
-                        petit_roque = Moves([r, c], [r, c + 2], self.board, True)
-                        petit_roque.set_roque_type('Petit Roque')
-                        move.append(petit_roque)
-                        print('move appended', petit_roque.is_roque, petit_roque.roque_type)
+                        petit_roque = Move([r, c], [r, c + 2], self.board, is_roque= True)
+                        moves.append(petit_roque)
+                        print('move appended', petit_roque.is_roque)
 
         elif colour == 'black':
             if self.current_roques_autorisation.black_grand_roque:
@@ -444,7 +451,6 @@ class ChessBoard:
     '''
     Pieces moves by piece type, j'ai rajouté pour faire fonctionner l'algorithme complexe abordé par le tuto
     la variable piece_cloue = True/False
-    
     '''
 
     def get_Pawn_moves(self, r, c, moves, colour):
@@ -461,33 +467,33 @@ class ChessBoard:
         if colour == 'white':
             if self.board[r - 1][c] == 'EmptySquare':
                 if not piece_clouee or pin_direction == (0, -1):
-                    moves.append(Moves([r, c], [r - 1, c], self.board))  # on avance d'une case s'il n'y a pas de pièce
+                    moves.append(Move([r, c], [r - 1, c], self.board))  # on avance d'une case s'il n'y a pas de pièce
             if r == 6 and self.board[r - 2][c] == 'EmptySquare' and self.board[r - 1][c] == 'EmptySquare':
                 if not piece_clouee or pin_direction == (0, -1):
-                    moves.append(Moves([r, c], [r - 2, c], self.board))
+                    moves.append(Move([r, c], [r - 2, c], self.board))
             if c + 1 <= 7:
                 if self.get_piece_colour([r - 1, c + 1]) == 'black':
                     if not piece_clouee or pin_direction == (-1, 1):
-                        moves.append(Moves([r, c], [r - 1, c + 1], self.board))
+                        moves.append(Move([r, c], [r - 1, c + 1], self.board))
             if c - 1 >= 0:
                 if self.get_piece_colour([r - 1, c - 1]) == 'black':
                     if not piece_clouee or pin_direction == (-1, -1):
-                        moves.append(Moves([r, c], [r - 1, c - 1], self.board))
+                        moves.append(Move([r, c], [r - 1, c - 1], self.board))
         if colour != 'white':
             if self.board[r + 1][c] == 'EmptySquare':
                 if not piece_clouee or pin_direction == (1, 0):
-                    moves.append(Moves([r, c], [r + 1, c], self.board))
+                    moves.append(Move([r, c], [r + 1, c], self.board))
             if r == 1 and self.board[r + 2][c] == 'EmptySquare':
                 if not piece_clouee or pin_direction == (1, 0):
-                    moves.append(Moves([r, c], [r + 2, c], self.board))
+                    moves.append(Move([r, c], [r + 2, c], self.board))
             if c + 1 <= 7:
                 if self.get_piece_colour([r + 1, c + 1]) == 'white':
                     if not piece_clouee or pin_direction == (1, 1):
-                        moves.append(Moves([r, c], [r + 1, c + 1], self.board))
+                        moves.append(Move([r, c], [r + 1, c + 1], self.board))
             if c - 1 >= 0:
                 if self.get_piece_colour([r + 1, c - 1]) == 'white':
                     if not piece_clouee or pin_direction == (1, -1):
-                        moves.append(Moves([r, c], [r + 1, c - 1], self.board))
+                        moves.append(Move([r, c], [r + 1, c - 1], self.board))
 
     def get_Knight_moves(self, r, c, moves, colour):
         piece_clouee = False
@@ -509,9 +515,9 @@ class ChessBoard:
                 end_col = c + d[1]
                 if 0 <= end_row < 8 and 0 <= end_col < 8:  # on est sur le board
                     if self.board[end_row][end_col] == 'EmptySquare':
-                        moves.append(Moves([r, c], [end_row, end_col], self.board))
+                        moves.append(Move([r, c], [end_row, end_col], self.board))
                     elif self.get_piece_colour([end_row, end_col]) != colour:
-                        moves.append(Moves([r, c], [end_row, end_col], self.board))
+                        moves.append(Move([r, c], [end_row, end_col], self.board))
                     else:
                         pass
 
@@ -539,9 +545,9 @@ class ChessBoard:
                     if 8 > end_col >= 0 and 8 > end_row >= 0:  # On est sur l'echiquier
                         end_piece = self.board[end_row][end_col]
                         if end_piece == 'EmptySquare':  # case vide
-                            moves.append(Moves([r, c], [end_row, end_col], self.board))
+                            moves.append(Move([r, c], [end_row, end_col], self.board))
                         elif self.get_piece_colour([end_row, end_col]) != colour:  # pièce adverse
-                            moves.append(Moves([r, c], [end_row, end_col], self.board))
+                            moves.append(Move([r, c], [end_row, end_col], self.board))
                             break  # on ne peut pas aller plus loin dans cette direction, break casse la loop direction
                         else:  # le dernier cas est une pièce alliée
                             break
@@ -570,10 +576,10 @@ class ChessBoard:
                         end_piece = self.board[end_row][end_col]
 
                         if end_piece == 'EmptySquare':  # case vide
-                            moves.append(Moves([r, c], [end_row, end_col], self.board))
+                            moves.append(Move([r, c], [end_row, end_col], self.board))
 
                         elif self.get_piece_colour([end_row, end_col]) != colour:  # pièce adverse
-                            moves.append(Moves([r, c], [end_row, end_col], self.board))
+                            moves.append(Move([r, c], [end_row, end_col], self.board))
                             break  # on ne peut pas aller plus loin dans cette direction, break casse la loop direction
 
                         elif self.get_piece_colour([end_row, end_col]) != colour:  # le dernier cas est une pièce alliée
@@ -607,10 +613,10 @@ class ChessBoard:
                         end_piece = self.board[end_row][end_col]
 
                         if end_piece == 'EmptySquare':  # case vide
-                            moves.append(Moves([r, c], [end_row, end_col], self.board))
+                            moves.append(Move([r, c], [end_row, end_col], self.board))
 
                         elif self.get_piece_colour([end_row, end_col]) != colour:  # pièce adverse
-                            moves.append(Moves([r, c], [end_row, end_col], self.board))
+                            moves.append(Move([r, c], [end_row, end_col], self.board))
 
                             break  # on ne peut pas aller plus loin dans cette direction, break casse la loop direction
                         else:  # le dernier cas est une pièce alliée
@@ -646,7 +652,7 @@ class ChessBoard:
                         self.black_king_location = [end_row, end_col]
                     in_check, clouage, echecs = self.check_for_pins_and_checks(colour)
                     if not in_check:
-                        moves.append(Moves([r, c], [end_row, end_col], self.board))
+                        moves.append(Move([r, c], [end_row, end_col], self.board))
                     """
                     Reset king location to previous (r,c)
                     """
@@ -667,7 +673,7 @@ class ChessBoard:
         # le roque contient deux moves"""
 
 
-class Moves():
+class Move:
     # contient les éléments d'un seul coup d'échec (pièces de départ et d'arrivée + le bord)
     ranks_to_row = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3,
                     "6": 2, "7": 1, "8": 0}
@@ -685,7 +691,6 @@ class Moves():
         self.captured_piece = board[self.end_row][self.end_col]
         self.moveID = self.start_row * 1000 + self.start_col * 100 + self.end_col * 10 + self.end_row
         self.is_roque = is_roque
-        self.roque_type = None
 
     '''
     Nous devons comparer les les Moves générés par les clics et les moves autorisés générés par le jeu. 
@@ -698,13 +703,11 @@ class Moves():
 
     # se renseigner sur la fonciton __eq__(self, other)
     def __eq__(self, other):
-        if isinstance(other, Moves):
+        if isinstance(other, Move):
             return self.moveID == other.moveID
         return False
 
-    def set_roque_type(self, roque_type) :
-        if self.is_roque :
-            self.roque_type = roque_type
+
 
     def get_notation(self):
         return self.getLetterRow(self.start_row, self.start_col) + self.getLetterRow(self.end_row, self.end_col)
