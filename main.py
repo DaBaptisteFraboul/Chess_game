@@ -173,6 +173,8 @@ class Game :
 
                 if event.key == pygame.K_a :
                     self.board.Undo_Move()
+                    if self.god_mod :
+                        self.board.next_color()
                     self.Valid_moves= self.board.get_Valid_moves(self.board.colour_to_play)
 
                 if event.key == pygame.K_b :

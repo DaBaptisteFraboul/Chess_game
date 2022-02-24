@@ -97,7 +97,7 @@ class ChessBoard:
 
     def get_piece_type(self, piece_square):
         '''
-        Get the piece of selected square
+        Get the piece in given square
         '''
         piece = self.board[piece_square[0]][piece_square[1]]
         if piece != 'EmptySquare':
@@ -124,12 +124,7 @@ class ChessBoard:
         if move.moved_piece == 'black_king':
             self.black_king_location = [move.end_row, move.end_col]
         """
-        Résumé du problème:
-        J'ai généré un move avec la variable is_roque == True:
-        1) Je dois sélectionner la tour pour le roque 
-            La tour doit être de la même coleur que le Roi
-            La tour doit correspondre au bon type de Roque (grand Roque / Petit Roque)
-        2) la placer de l'autre côté du Roi 
+        Handle Roque move
         """
         if move.is_roque == True:
             tower_row = None
@@ -163,19 +158,45 @@ class ChessBoard:
     def Undo_Move(self):
         if self.move_LOG:
             last_move = self.move_LOG[-1]
-            if last_move.is_roque == False:
-                self.board[last_move.end_row][
-                    last_move.end_col] = last_move.captured_piece  # on change la pièce d'arrivée
-                self.board[last_move.start_row][last_move.start_col] = last_move.moved_piece
+            self.board[last_move.end_row][
+                last_move.end_col] = last_move.captured_piece  # on change la pièce d'arrivée
+            self.board[last_move.start_row][last_move.start_col] = last_move.moved_piece
+            if last_move.moved_piece == 'white_king':
+                self.white_king_location = [last_move.start_row, last_move.start_col]
+            if last_move.moved_piece == 'black_king':
+                self.black_king_location = [last_move.start_row, last_move.start_col]
+            self.next_color()
+            self.move_LOG.pop(-1)
+            if last_move.is_roque:
+                #just like Make move but reversed
+                tower_row = None
+                tower_col = None
+                tower_colour = None
+                # On détermine la rangée de la tour
                 if last_move.moved_piece == 'white_king':
-                    self.white_king_location = [last_move.start_row, last_move.start_col]
-                if last_move.moved_piece == 'black_king':
-                    self.black_king_location = [last_move.start_row, last_move.start_col]
-                self.next_color()
-                self.move_LOG.pop(-1)
-            elif last_move.is_roque:
-                pass
-                # undo roque
+                    tower_row = 7
+                    tower_colour = 'white'
+
+                else:
+                    tower_row = 0
+                    tower_colour = 'black'
+                if last_move.end_col == 2:
+                    tower_col = 0
+                    self.board[last_move.start_row][last_move.end_col + 1] = 'EmptySquare'
+                    self.board[tower_row][tower_col] = tower_colour + '_rock'
+                    if tower_colour == 'white' :
+                        self.current_roques_autorisation.white_grand_roque = True
+                    else :
+                        self.current_roques_autorisation.black_grand_roque = True
+                if last_move.end_col == 6:
+                    tower_col = 7
+                    self.board[last_move.start_row][last_move.end_col - 1] = 'EmptySquare'
+                    self.board[tower_row][tower_col] = tower_colour + '_rock'
+                    if tower_colour == 'white' :
+                        self.current_roques_autorisation.white_petit_roque = True
+                    else :
+                        self.current_roques_autorisation.black_petit_roque = True
+
             else:
                 print("no moves to undo, trait aux blancs!")
 
@@ -421,26 +442,32 @@ class ChessBoard:
                             self.square_under_attack([r], [c], self.colour_to_play)):
 
                         grand_roque = Move([r, c], [r, c - 2], self.board, is_roque= True)
-
                         moves.append(grand_roque)
-                        print('move appended')
 
             if self.current_roques_autorisation.white_petit_roque:
                 if self.board[r][c + 1] == 'EmptySquare' and self.board[r][c + 2] == 'EmptySquare':
                     print("EmptySquare_check_passed")
-                    # Trouver une manière la manière correcte d'ajoueter deux conditions if noot
                     if not (self.square_under_attack([r],[c + 1], self.colour_to_play) and
                             self.square_under_attack([r],[c],self.colour_to_play)):
 
                         petit_roque = Move([r, c], [r, c + 2], self.board, is_roque= True)
                         moves.append(petit_roque)
-                        print('move appended', petit_roque.is_roque)
 
         elif colour == 'black':
             if self.current_roques_autorisation.black_grand_roque:
-                pass
+                if self.board[r][c - 1] == 'EmptySquare' and self.board[r][c - 2] == 'EmptySquare':
+                    if not (self.square_under_attack([r], [c - 1], self.colour_to_play) and
+                            self.square_under_attack([r], [c], self.colour_to_play)) :
+
+                        grand_roque = Move([r, c], [r, c - 2], self.board, is_roque=True)
+                        moves.append(grand_roque)
+
             if self.current_roques_autorisation.black_petit_roque:
-                pass
+                if not (self.square_under_attack([r], [c + 1], self.colour_to_play) and
+                        self.square_under_attack([r], [c], self.colour_to_play)):
+
+                    petit_roque = Move([r, c], [r, c + 2], self.board, is_roque=True)
+                    moves.append(petit_roque)
         else:
             return
 
