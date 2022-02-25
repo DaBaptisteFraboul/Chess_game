@@ -186,16 +186,22 @@ class ChessBoard:
                     self.board[tower_row][tower_col] = tower_colour + '_rock'
                     if tower_colour == 'white' :
                         self.current_roques_autorisation.white_grand_roque = True
+                        self.current_roques_autorisation.white_petit_roque = True
+
                     else :
                         self.current_roques_autorisation.black_grand_roque = True
+                        self.current_roques_autorisation.black_petit_roque = True
+
                 if last_move.end_col == 6:
                     tower_col = 7
                     self.board[last_move.start_row][last_move.end_col - 1] = 'EmptySquare'
                     self.board[tower_row][tower_col] = tower_colour + '_rock'
                     if tower_colour == 'white' :
                         self.current_roques_autorisation.white_petit_roque = True
+                        self.current_roques_autorisation.white_grand_roque = True
                     else :
                         self.current_roques_autorisation.black_petit_roque = True
+                        self.current_roques_autorisation.black_grand_roque = True
 
             else:
                 print("no moves to undo, trait aux blancs!")
