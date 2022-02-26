@@ -236,10 +236,6 @@ class ChessBoard:
                 else:
                     pass
 
-        for move in moves :
-            if move.is_roque :
-                print("Transfered roque")
-
         return moves
 
     def get_all_moves_without_Roque(self, player_colour):
@@ -312,7 +308,6 @@ class ChessBoard:
             king_loc = self.black_king_location
         self.inCheck, self.clouage, self.checks = self.check_for_pins_and_checks(colour)
         if self.inCheck:  # nous sommes en echec/ nous allons générer les réponses à l'échec
-            print(len(self.checks))
             '''
             Pour chaque echec (case + direction), générons les réopnses possible
             '''
@@ -322,7 +317,6 @@ class ChessBoard:
                 check_row = check[0]
                 check_col = check[1]
                 checking_piece = self.board[check_row][check_col]
-                print(checking_piece)
                 self.valid_squares = []  # cases sur lesquelles une pièce peut bouger pour empêcher l'échec
                 if self.get_piece_type([check_row,
                                         check_col]) == 'knight':  # on ne peut pas bloquer le cavalier, il faut bouger le roi ou manger le cavalier
@@ -336,11 +330,10 @@ class ChessBoard:
                             break
                 # il faut se débarasser des moves qui n'enlèvent pas l'échec
 
-                print(self.valid_squares)
                 for i in range(len(legal_moves) - 1, -1,
                                -1):  # on boucle à l'envers pour retirer les éléments d'une liste
-                    if self.get_piece_type([legal_moves[i].start_row, legal_moves[
-                        i].start_col]) != 'king':  # si le move n'est pas un move du roi alors il doit bloquer ou manger la pièce, finir sur une valid square
+                    if self.get_piece_type([legal_moves[i].start_row, legal_moves[i].start_col]) != 'king':
+                        # si le move n'est pas un move du roi alors il doit bloquer ou manger la pièce, finir sur une valid square
                         if not (legal_moves[i].end_row, legal_moves[i].end_col) in self.valid_squares:
                             legal_moves.remove(legal_moves[i])
 
@@ -382,16 +375,19 @@ class ChessBoard:
                            8):  # pour chaque case on ajoute l'offset multiplié par l'itération => case finale du move
                 check_row = king_loc[0] + i * d[0]
                 check_col = king_loc[1] + i * d[1]
-                if 0 < check_col < 8 and 0 < check_row < 8:
+                #inside Board
+                if 0 <= check_col <= 7 and 0 <= check_row <= 7:
+                    #check_piece
                     check_piece = self.board[check_row][check_col]
+                    # if
                     if self.get_piece_colour([check_row, check_col]) == colour and \
                             self.get_piece_type([check_row, check_col]) != 'king':  # pièce alliée clouage possible
                         if possible_pin == ():
                             possible_pin = (check_row, check_col, d[0], d[1])
                         else:  # je suis protégé par deux pièces il n'y a pas de clouage
                             break
-                    elif self.get_piece_colour(
-                            [check_row, check_col]) == op_colour:  # il y une pièece adverse vérifier l'échec
+                    elif self.get_piece_colour([check_row, check_col]) == op_colour:
+                        # il y une pièece adverse vérifier l'échec
                         '''
                         condition complexe ici : nous sommes en echec si :
                         1) nous vérifions une colonne et la pièce est une tour
@@ -400,12 +396,13 @@ class ChessBoard:
                         4) la pièce est une dame (peut importe la direction)
                         5) il y a un roi deux case plus loin (pour empêcher le deplacement de notre roi sur une pièce controlé par un roi adverse)
                         '''
-                        type = self.get_piece_type([check_row, check_col])
-                        if (0 <= j <= 3 and type == 'rock') or \
-                                (4 <= j <= 7 and type == 'bishop') or \
-                                (type == 'queen') or (i == 1 and type == 'king') or \
-                                (i == 1 and (
-                                        (colour == 'white' and 4 <= j <= 5) or (colour == 'black' and 6 <= j <= 7))):
+                        piece_type = self.get_piece_type([check_row, check_col])
+                        print(piece_type)
+                        if (0 <= j <= 3 and piece_type == 'rock') or \
+                            (4 <= j <= 7 and piece_type == 'bishop') or \
+                            (piece_type == 'queen') or \
+                            (i == 1 and piece_type == 'king') or \
+                            (i == 1 and ((colour == 'white' and 4 <= j <= 5) or (colour == 'black' and 6 <= j <= 7))):
                             if possible_pin == ():  # il n'y a pas de pièce qui peut défendre le roi
                                 incheck = True
                                 echecs.append((check_row, check_col, d[0], d[1]))
@@ -415,6 +412,8 @@ class ChessBoard:
                                 break
                         else:  # la pièce ne peut pas attaquer le roi ( par exemple la pièce est un cavalier adverse)
                             break
+                    else : #square is empty
+                        pass
                 else:  # nous sommes sorti de l'échiquier
                     break
         # nous pouvons maintenant vérifier si les case de type cavaliers menace le roi
@@ -427,7 +426,6 @@ class ChessBoard:
                 if self.get_piece_type([check_row, check_col]) == 'knight' and \
                         self.get_piece_colour([check_row, check_col]) == op_colour:
                     incheck = True
-                    print("echec par cavalier")
                     echecs.append((check_row, check_col, m[0], m[1]))
                     break
         return incheck, clouage, echecs
@@ -452,7 +450,6 @@ class ChessBoard:
 
             if self.current_roques_autorisation.white_petit_roque:
                 if self.board[r][c + 1] == 'EmptySquare' and self.board[r][c + 2] == 'EmptySquare':
-                    print("EmptySquare_check_passed")
                     if not (self.square_under_attack([r],[c + 1], self.colour_to_play) and
                             self.square_under_attack([r],[c],self.colour_to_play)):
 
@@ -535,7 +532,6 @@ class ChessBoard:
             if self.clouage[i][0] == r and self.clouage[i][1] == c:
                 piece_clouee = True
                 pin_direction = (self.clouage[i][2], self.clouage[i][3])
-                print(pin_direction)
                 self.clouage.remove(self.clouage[i])
                 break
 
@@ -563,7 +559,6 @@ class ChessBoard:
             if self.clouage[i][0] == r and self.clouage[i][1] == c:
                 piece_clouee = True
                 pin_direction = (self.clouage[i][2], self.clouage[i][3])
-                print(pin_direction)
                 self.clouage.remove(self.clouage[i])
                 break
 
@@ -594,7 +589,6 @@ class ChessBoard:
             if self.clouage[i][0] == r and self.clouage[i][1] == c:
                 piece_clouee = True
                 pin_direction = (self.clouage[i][2], self.clouage[i][3])
-                print(pin_direction)
                 self.clouage.remove(self.clouage[i])
                 break
         # même fonctionnement que pour le fou mais on change les directions
@@ -630,7 +624,6 @@ class ChessBoard:
             if self.clouage[i][0] == r and self.clouage[i][1] == c:
                 piece_clouee = True
                 pin_direction = (self.clouage[i][2], self.clouage[i][3])
-                print(pin_direction)
                 self.clouage.remove(self.clouage[i])
                 break
         # même fonctionnement que pour la tour mais on fusionne les directions du fou et de la tour
@@ -675,15 +668,20 @@ class ChessBoard:
             end_col = c + d[1]
             end_row = r + d[0]
             if 0 <= end_row < 8 and 0 <= end_col < 8:
-                if self.get_piece_colour([end_row, end_col]) != colour or self.board[end_row][end_col] == 'EmptySquare':
+                if self.get_piece_colour([end_row, end_col]) != colour :
                     """
                     Update king location to check for checks
                     """
                     if colour == 'white':
                         self.white_king_location = [end_row, end_col]
-                    else:
+                        print(self.white_king_location)
+                    if colour == 'black':
                         self.black_king_location = [end_row, end_col]
+                        print(self.black_king_location)
+
                     in_check, clouage, echecs = self.check_for_pins_and_checks(colour)
+                    if in_check :
+                        print("possible check")
                     if not in_check:
                         moves.append(Move([r, c], [end_row, end_col], self.board))
                     """
@@ -691,7 +689,7 @@ class ChessBoard:
                     """
                     if colour == 'white':
                         self.white_king_location = [r, c]
-                    else:
+                    if colour == 'black':
                         self.black_king_location = [r, c]
                 else:
                     pass
