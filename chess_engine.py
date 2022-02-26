@@ -391,7 +391,6 @@ class ChessBoard:
                         5) il y a un roi deux case plus loin (pour empêcher le deplacement de notre roi sur une pièce controlé par un roi adverse)
                         '''
                         piece_type = self.get_piece_type([check_row, check_col])
-                        print(piece_type)
                         if (0 <= j <= 3 and piece_type == 'rock') or \
                             (4 <= j <= 7 and piece_type == 'bishop') or \
                             (piece_type == 'queen') or \
@@ -434,34 +433,35 @@ class ChessBoard:
         if self.inCheck:
             return
         if colour == 'white':
+            king_loc = self.white_king_location
             if self.current_roques_autorisation.white_grand_roque:
                 if self.board[r][c - 1] == 'EmptySquare' and self.board[r][c - 2] == 'EmptySquare':
-                    if not (self.square_under_attack([r], [c - 1], self.colour_to_play) and
-                            self.square_under_attack([r], [c], self.colour_to_play)):
-
+                    if not (self.square_under_attack(r, c - 2, self.colour_to_play) or
+                            self.square_under_attack(r, c -1 , self.colour_to_play)):
                         grand_roque = Move([r, c], [r, c - 2], self.board, is_roque= True)
                         moves.append(grand_roque)
 
             if self.current_roques_autorisation.white_petit_roque:
                 if self.board[r][c + 1] == 'EmptySquare' and self.board[r][c + 2] == 'EmptySquare':
-                    if not (self.square_under_attack([r],[c + 1], self.colour_to_play) and
-                            self.square_under_attack([r],[c],self.colour_to_play)):
+
+                    if  (not self.square_under_attack(r,c + 2, self.colour_to_play) and
+                           not self.square_under_attack(r,c + 1,self.colour_to_play)):
 
                         petit_roque = Move([r, c], [r, c + 2], self.board, is_roque= True)
                         moves.append(petit_roque)
 
         elif colour == 'black':
+            king_loc = self.black_king_location
             if self.current_roques_autorisation.black_grand_roque:
                 if self.board[r][c - 1] == 'EmptySquare' and self.board[r][c - 2] == 'EmptySquare':
-                    if not (self.square_under_attack([r], [c - 1], self.colour_to_play) and
-                            self.square_under_attack([r], [c], self.colour_to_play)) :
-
+                    if  (not self.square_under_attack(r, c - 2, self.colour_to_play) or
+                            not self.square_under_attack(r, c - 1, self.colour_to_play)) :
                         grand_roque = Move([r, c], [r, c - 2], self.board, is_roque=True)
                         moves.append(grand_roque)
 
             if self.current_roques_autorisation.black_petit_roque:
-                if not (self.square_under_attack([r], [c + 1], self.colour_to_play) and
-                        self.square_under_attack([r], [c], self.colour_to_play)):
+                if not (self.square_under_attack(r, c + 2, self.colour_to_play) or
+                        self.square_under_attack(r, c + 1, self.colour_to_play)):
 
                     petit_roque = Move([r, c], [r, c + 2], self.board, is_roque=True)
                     moves.append(petit_roque)
@@ -668,10 +668,8 @@ class ChessBoard:
                     """
                     if colour == 'white':
                         self.white_king_location = [end_row, end_col]
-                        print(self.white_king_location)
                     if colour == 'black':
                         self.black_king_location = [end_row, end_col]
-                        print(self.black_king_location)
 
                     in_check, clouage, echecs = self.check_for_pins_and_checks(colour)
                     if in_check :

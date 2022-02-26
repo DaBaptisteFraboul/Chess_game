@@ -149,9 +149,7 @@ class Game :
                     if self.god_mod :
                         self.board.next_color()
                     self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
-                    for move in self.Valid_moves :
-                        if move.is_roque :
-                            print("OK")
+
                     self.move_made = False
             else :
                 print("Outside gameboard")
