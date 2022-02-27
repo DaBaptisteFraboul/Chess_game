@@ -124,6 +124,18 @@ class ChessBoard:
         if move.moved_piece == 'black_king':
             self.black_king_location = [move.end_row, move.end_col]
         """
+        Handle En passant
+        """
+        if move.is_en_passant :
+            if self.colour_to_play == 'white' :
+                print('white_passing')
+                print(move.end_row + 1, move.end_col)
+                self.board[move.end_row + 1][move.end_col] = 'EmptySquare'
+                move.captured_piece == 'black_pawn'
+            if move.moved_piece == 'black_pawn' :
+                self.board[move.end_row - 1][move.end_col] = 'EmptySquare'
+                move.captured_piece == 'white_pawn'
+        """
         Handle Roque move
         """
         if move.is_roque == True:
@@ -493,14 +505,28 @@ class ChessBoard:
                 pin_direction = (self.clouage[i][2], self.clouage[i][3])
                 self.clouage.remove(self.clouage[i])
                 break
-
+        # gestion du en passsant :
+        '''
+        Le move en passant peut se faire sous deux conditions :
+        le pion se trouve sur la rangée 3 (blancs) ou 4 (noir)
+        le précédent coup était une charge d'un pion à côté de la pièce 
+        
+        '''
         if colour == 'white':
+            if len(self.move_LOG) != 0:
+                if self.move_LOG[-1].is_pawn_charge :
+                    if (self.move_LOG[-1].end_col == c + 1 or self.move_LOG[-1].end_col == c - 1) and \
+                    r == 3 :
+                        print('En passant move appended')
+                        moves.append(
+                            Move([r, c], [self.move_LOG[-1].end_row - 1, self.move_LOG[-1].end_col], self.board, False, False,
+                                 True))
             if self.board[r - 1][c] == 'EmptySquare':
                 if not piece_clouee or pin_direction == (0, -1):
                     moves.append(Move([r, c], [r - 1, c], self.board))  # on avance d'une case s'il n'y a pas de pièce
             if r == 6 and self.board[r - 2][c] == 'EmptySquare' and self.board[r - 1][c] == 'EmptySquare':
                 if not piece_clouee or pin_direction == (0, -1):
-                    moves.append(Move([r, c], [r - 2, c], self.board))
+                    moves.append(Move([r, c], [r - 2, c], self.board,False, True))
             if c + 1 <= 7:
                 if self.get_piece_colour([r - 1, c + 1]) == 'black':
                     if not piece_clouee or pin_direction == (-1, 1):
@@ -510,12 +536,18 @@ class ChessBoard:
                     if not piece_clouee or pin_direction == (-1, -1):
                         moves.append(Move([r, c], [r - 1, c - 1], self.board))
         if colour != 'white':
+            if self.move_LOG[-1].is_pawn_charge :
+                if (self.move_LOG[-1].end_col == c + 1 or self.move_LOG[-1].end_col == c - 1) and \
+                r == 4:
+                    moves.append(
+                        Move([r, c], [self.move_LOG[-1].end_row + 1, self.move_LOG[-1].end_col], self.board, False, False,True
+                            ))
             if self.board[r + 1][c] == 'EmptySquare':
                 if not piece_clouee or pin_direction == (1, 0):
                     moves.append(Move([r, c], [r + 1, c], self.board))
             if r == 1 and self.board[r + 2][c] == 'EmptySquare':
                 if not piece_clouee or pin_direction == (1, 0):
-                    moves.append(Move([r, c], [r + 2, c], self.board))
+                    moves.append(Move([r, c], [r + 2, c], self.board, False,True))
             if c + 1 <= 7:
                 if self.get_piece_colour([r + 1, c + 1]) == 'white':
                     if not piece_clouee or pin_direction == (1, 1):
@@ -711,7 +743,7 @@ class Move:
                      "c": 2, "b": 1, "a": 0}
     letter_to_col = {v: k for k, v in col_to_letter.items()}
 
-    def __init__(self, start_sq, end_sq, board, is_roque = False):
+    def __init__(self, start_sq, end_sq, board, is_roque = False, is_pawn_charge = False, is_en_passant = False):
         self.start_row = start_sq[0]
         self.start_col = start_sq[1]
         self.end_row = end_sq[0]
@@ -720,6 +752,8 @@ class Move:
         self.captured_piece = board[self.end_row][self.end_col]
         self.moveID = self.start_row * 1000 + self.start_col * 100 + self.end_col * 10 + self.end_row
         self.is_roque = is_roque
+        self.is_pawn_charge = is_pawn_charge
+        self.is_en_passant = is_en_passant
 
     '''
     Nous devons comparer les les Moves générés par les clics et les moves autorisés générés par le jeu. 
@@ -733,7 +767,10 @@ class Move:
     # se renseigner sur la fonciton __eq__(self, other)
     def __eq__(self, other):
         if isinstance(other, Move):
-            return self.moveID == other.moveID
+            if self.moveID == other.moveID :
+                self.is_pawn_charge = other.is_pawn_charge
+                self.is_en_passant = other.is_en_passant
+                return True
         return False
 
 

@@ -128,7 +128,10 @@ class Game :
                             if self.board.get_piece_type(self.player_clicks[0]) == 'king' and\
                                 self.player_clicks[0][1] - self.player_clicks[1][1] != 1 :
                                     move.is_roque = True
+
                             if move in self.Valid_moves:
+                                if move.is_pawn_charge :
+                                    print('charge')
                                 self.board.Make_Move(move)
                                 self.move_made = True
                                 self.player_clicks = []  # deselect
