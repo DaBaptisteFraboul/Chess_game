@@ -10,7 +10,7 @@ Roadmap of implementations to make :
   🎲 Game mechanics : 
   
     ✅ Castling move 
-    ⬜ En-passant move 
+    ✅ En-passant move 
     ⬜ Pawn promotion
     ✅ Pieces moves
       ✅ Knight moves
