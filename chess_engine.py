@@ -131,10 +131,11 @@ class ChessBoard:
                 print('white_passing')
                 print(move.end_row + 1, move.end_col)
                 self.board[move.end_row + 1][move.end_col] = 'EmptySquare'
-                move.captured_piece == 'black_pawn'
+                move.captured_piece = 'black_pawn'
             if move.moved_piece == 'black_pawn' :
                 self.board[move.end_row - 1][move.end_col] = 'EmptySquare'
-                move.captured_piece == 'white_pawn'
+                move.captured_piece = 'white_pawn'
+            print(move.captured_piece)
         """
         Handle Roque move
         """
@@ -170,8 +171,7 @@ class ChessBoard:
     def Undo_Move(self):
         if self.move_LOG:
             last_move = self.move_LOG[-1]
-            self.board[last_move.end_row][
-                last_move.end_col] = last_move.captured_piece  # on change la pièce d'arrivée
+            self.board[last_move.end_row][last_move.end_col] = last_move.captured_piece  # on change la pièce d'arrivée
             self.board[last_move.start_row][last_move.start_col] = last_move.moved_piece
             if last_move.moved_piece == 'white_king':
                 self.white_king_location = [last_move.start_row, last_move.start_col]
@@ -179,6 +179,12 @@ class ChessBoard:
                 self.black_king_location = [last_move.start_row, last_move.start_col]
             self.next_color()
             self.move_LOG.pop(-1)
+            if last_move.is_en_passant :
+                if last_move.moved_piece == 'white_pawn' :
+                    self.board[last_move.end_row + 1][last_move.end_col] = last_move.captured_piece
+                if last_move.moved_piece == 'black_pawn' :
+                    self.board[last_move.end_row - 1][last_move.end_col] = last_move.captured_piece
+                self.board[last_move.end_row][last_move.end_col] = 'EmptySquare'
             if last_move.is_roque:
                 #just like Make move but reversed
                 tower_row = None
@@ -215,8 +221,8 @@ class ChessBoard:
                         self.current_roques_autorisation.black_petit_roque = True
                         self.current_roques_autorisation.black_grand_roque = True
 
-            else:
-                print("no moves to undo, trait aux blancs!")
+        else:
+            print("no moves to undo, trait aux blancs!")
 
     def get_all_possibles_moves(self, player_colour):
         moves = []
