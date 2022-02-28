@@ -25,7 +25,7 @@ Roadmap of implementations to make :
   🎨 Art :
   
     🟧 Complete redesign :
-      ⬜ Pieces
+      🟧 Pieces
       ⬜ Board
     ⬜ GUI
     ⬜ Victory screen
