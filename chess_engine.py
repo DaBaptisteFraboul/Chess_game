@@ -50,6 +50,7 @@ class ChessBoard:
                                                            self.current_roques_autorisation.white_petit_roque,
                                                            self.current_roques_autorisation.black_petit_roque,
                                                            self.current_roques_autorisation.black_grand_roque)]
+        self.ongoing_promotion = False
 
     def next_color(self):
         if self.colour_to_play == "white":
@@ -114,6 +115,31 @@ class ChessBoard:
     def set_starting_position(self):
         self.board = constants.starting_position
 
+    def set_promotion_menu(self, screen):
+        while self.ongoing_promotion :
+            mx, my = pygame.mouse.get_pos()
+            white_rock_image = constants.Images['white_rock']
+            white_bishop_image = constants.Images['white_bishop']
+            white_kngiht_image = constants.Images['white_kngiht']
+            white_queen_image = constants.Images['white_queen']
+            black_rock_image = constants.Images['black_rock']
+            black_bishop_image = constants.Images['black_bishop']
+            black_kngiht_image = constants.Images['black_kngiht']
+            black_queen_image = constants.Images['black_queen']
+
+
+
+
+
+            
+            for event in pygame.event.get() :
+                if event.type == pygame.MOUSEBUTTONDOWN :
+                    if event.button == 1 :
+                        click = True
+
+
+
+
     def Make_Move(self, move):
         #Classic Move
 
@@ -123,6 +149,20 @@ class ChessBoard:
             self.white_king_location = [move.end_row, move.end_col]
         if move.moved_piece == 'black_king':
             self.black_king_location = [move.end_row, move.end_col]
+
+        '''
+        Handle Pawn promotion
+        '''
+        if move.moved_piece == 'white_pawn' and move.end_row == 0 :
+            move.is_promotion = True
+            self.ongoing_promotion = True
+
+        if move.moved_piece == 'black_pawn' and move.end_row == 7 :
+            move.is_promotion = True
+            self.ongoing_promotion = True
+
+
+
         """
         Handle En passant
         """
@@ -447,6 +487,9 @@ class ChessBoard:
                     break
         return incheck, clouage, echecs
 
+
+
+
     def get_Roque_Moves(self, r, c, moves, colour):
         '''
         Un Roque est un Move constitué de deux moves
@@ -749,7 +792,7 @@ class Move:
                      "c": 2, "b": 1, "a": 0}
     letter_to_col = {v: k for k, v in col_to_letter.items()}
 
-    def __init__(self, start_sq, end_sq, board, is_roque = False, is_pawn_charge = False, is_en_passant = False):
+    def __init__(self, start_sq, end_sq, board, is_roque = False, is_pawn_charge = False, is_en_passant = False, is_promotion = False):
         self.start_row = start_sq[0]
         self.start_col = start_sq[1]
         self.end_row = end_sq[0]
@@ -760,6 +803,7 @@ class Move:
         self.is_roque = is_roque
         self.is_pawn_charge = is_pawn_charge
         self.is_en_passant = is_en_passant
+        self.is_promotion = is_promoiton
 
     '''
     Nous devons comparer les les Moves générés par les clics et les moves autorisés générés par le jeu. 
@@ -776,6 +820,7 @@ class Move:
             if self.moveID == other.moveID :
                 self.is_pawn_charge = other.is_pawn_charge
                 self.is_en_passant = other.is_en_passant
+                self.is_promotion = other.is_promotion
                 return True
         return False
 
