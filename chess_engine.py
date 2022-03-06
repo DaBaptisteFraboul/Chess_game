@@ -51,6 +51,7 @@ class ChessBoard:
                                                            self.current_roques_autorisation.black_petit_roque,
                                                            self.current_roques_autorisation.black_grand_roque)]
         self.ongoing_promotion = False
+        self.promotion_list = []
 
     def next_color(self):
         if self.colour_to_play == "white":
@@ -115,27 +116,63 @@ class ChessBoard:
     def set_starting_position(self):
         self.board = constants.starting_position
 
-    def set_promotion_menu(self, screen):
+    def set_promotion_menu(self, screen, promotion_square):
+
+        if self.colour_to_play == 'white' :
+            rock_image = constants.Images['white_rock']
+            bishop_image = constants.Images['white_bishop']
+            knight_image = constants.Images['white_knight']
+            queen_image = constants.Images['white_queen']
+        if self.colour_to_play == 'black' :
+            rock_image = constants.Images['black_rock']
+            bishop_image = constants.Images['black_bishop']
+            knight_image = constants.Images['black_knight']
+            queen_image = constants.Images['black_queen']
+
+        rock_rect = rock_image.get_rect()
+        bishop_rect = bishop_image.get_rect()
+        knight_rect = knight_image.get_rect()
+        queen_rect = queen_image.get_rect()
+
+        if self.colour_to_play == 'white' :
+            queen_rect.move_ip(promotion_square[1] - 96, promotion_square[0]-64)
+            knight_rect.move_ip(promotion_square[1] - 32, promotion_square[0] - 64)
+            rock_rect.move_ip(promotion_square[1] + 32, promotion_square[0] - 64)
+            bishop_rect.move_ip(promotion_square[1] + 96, promotion_square[0] - 64)
+        if self.colour_to_play == 'black' :
+            queen_rect.move_ip(promotion_square[1] - 96, promotion_square[0] + 64)
+            knight_rect.move_ip(promotion_square[1] - 32, promotion_square[0] + 64)
+            rock_rect.move_ip(promotion_square[1] + 32, promotion_square[0] + 64)
+            bishop_rect.move_ip(promotion_square[1] + 96, promotion_square[0] + 64)
+        print(promotion_square[0] -  96 , promotion_square[1] - 64 )
+        #queen_rect.move_ip((400,30))
+
+        """
+        Position des carrés de sélection de la pièce promue :
+        Reine / cavalier / Tour / Fou
+        taille des carré 64x64 
+        
+        """
         while self.ongoing_promotion :
             mx, my = pygame.mouse.get_pos()
-            white_rock_image = constants.Images['white_rock']
-            white_bishop_image = constants.Images['white_bishop']
-            white_kngiht_image = constants.Images['white_kngiht']
-            white_queen_image = constants.Images['white_queen']
-            black_rock_image = constants.Images['black_rock']
-            black_bishop_image = constants.Images['black_bishop']
-            black_kngiht_image = constants.Images['black_kngiht']
-            black_queen_image = constants.Images['black_queen']
 
+            screen.blit(queen_image, queen_rect)
+            screen.blit(knight_image, knight_rect)
+            screen.blit(rock_image, rock_rect)
+            screen.blit(bishop_image, bishop_rect)
 
+            pygame.display.flip()
+            #display
 
-
-
-            
             for event in pygame.event.get() :
+                if event.type == pygame.KEYDOWN :
+                    if event.key == pygame.K_ESCAPE :
+                        self.ongoing_promotion = False
+
                 if event.type == pygame.MOUSEBUTTONDOWN :
                     if event.button == 1 :
                         click = True
+
 
 
 
@@ -158,6 +195,7 @@ class ChessBoard:
             self.ongoing_promotion = True
 
         if move.moved_piece == 'black_pawn' and move.end_row == 7 :
+            print("promotion")
             move.is_promotion = True
             self.ongoing_promotion = True
 
@@ -204,8 +242,6 @@ class ChessBoard:
 
         # Mettre à jour les droits de Roques
         self.current_roques_autorisation.Update_roque_authorisation(move)
-
-        self.next_color()
         self.move_LOG.append(move)
 
     def Undo_Move(self):
@@ -268,8 +304,8 @@ class ChessBoard:
                 type = self.get_piece_type(piece_square)
                 if colour == player_colour:
                     if type == "pawn":
-                        self.get_Pawn_moves(rows, c, moves, colour
-                                            )
+                        self.get_Pawn_moves(rows, c, moves, colour)
+
                     elif type == 'knight':
                         self.get_Knight_moves(rows, c, moves, colour)
 
@@ -556,49 +592,56 @@ class ChessBoard:
         
         '''
         if colour == 'white':
-            if len(self.move_LOG) != 0:
-                if self.move_LOG[-1].is_pawn_charge :
-                    if (self.move_LOG[-1].end_col == c + 1 or self.move_LOG[-1].end_col == c - 1) and \
-                    r == 3 :
-                        print('En passant move appended')
-                        moves.append(
-                            Move([r, c], [self.move_LOG[-1].end_row - 1, self.move_LOG[-1].end_col], self.board, False, False,
-                                 True))
-            if self.board[r - 1][c] == 'EmptySquare':
-                if not piece_clouee or pin_direction == (0, -1):
-                    moves.append(Move([r, c], [r - 1, c], self.board))  # on avance d'une case s'il n'y a pas de pièce
-            if r == 6 and self.board[r - 2][c] == 'EmptySquare' and self.board[r - 1][c] == 'EmptySquare':
-                if not piece_clouee or pin_direction == (0, -1):
-                    moves.append(Move([r, c], [r - 2, c], self.board,False, True))
-            if c + 1 <= 7:
-                if self.get_piece_colour([r - 1, c + 1]) == 'black':
-                    if not piece_clouee or pin_direction == (-1, 1):
-                        moves.append(Move([r, c], [r - 1, c + 1], self.board))
-            if c - 1 >= 0:
-                if self.get_piece_colour([r - 1, c - 1]) == 'black':
-                    if not piece_clouee or pin_direction == (-1, -1):
-                        moves.append(Move([r, c], [r - 1, c - 1], self.board))
-        if colour != 'white':
-            if self.move_LOG[-1].is_pawn_charge :
-                if (self.move_LOG[-1].end_col == c + 1 or self.move_LOG[-1].end_col == c - 1) and \
-                r == 4:
-                    moves.append(
-                        Move([r, c], [self.move_LOG[-1].end_row + 1, self.move_LOG[-1].end_col], self.board, False, False,True
-                            ))
-            if self.board[r + 1][c] == 'EmptySquare':
-                if not piece_clouee or pin_direction == (1, 0):
-                    moves.append(Move([r, c], [r + 1, c], self.board))
-            if r == 1 and self.board[r + 2][c] == 'EmptySquare':
-                if not piece_clouee or pin_direction == (1, 0):
-                    moves.append(Move([r, c], [r + 2, c], self.board, False,True))
-            if c + 1 <= 7:
-                if self.get_piece_colour([r + 1, c + 1]) == 'white':
-                    if not piece_clouee or pin_direction == (1, 1):
-                        moves.append(Move([r, c], [r + 1, c + 1], self.board))
-            if c - 1 >= 0:
-                if self.get_piece_colour([r + 1, c - 1]) == 'white':
-                    if not piece_clouee or pin_direction == (1, -1):
-                        moves.append(Move([r, c], [r + 1, c - 1], self.board))
+            if 0 <= r <= 7 and 0 <= c <= 7:
+                if len(self.move_LOG) != 0:
+                    if self.move_LOG[-1].is_pawn_charge :
+                        if (self.move_LOG[-1].end_col == c + 1 or self.move_LOG[-1].end_col == c - 1) and \
+                        r == 3 :
+                            moves.append(
+                                Move([r, c], [self.move_LOG[-1].end_row - 1, self.move_LOG[-1].end_col], self.board, False, False,
+                                     True))
+                if self.board[r - 1][c] == 'EmptySquare' :
+                    if not piece_clouee or pin_direction == (0, -1):
+                        moves.append(Move([r, c], [r - 1, c], self.board))  # on avance d'une case s'il n'y a pas de pièce
+                if r == 6 and self.board[r - 2][c] == 'EmptySquare' and self.board[r - 1][c] == 'EmptySquare':
+                    if not piece_clouee or pin_direction == (0, -1):
+                        moves.append(Move([r, c], [r - 2, c], self.board,False, True))
+                if c + 1 <= 7:
+                    if self.get_piece_colour([r - 1, c + 1]) == 'black':
+                        if not piece_clouee or pin_direction == (-1, 1):
+                            moves.append(Move([r, c], [r - 1, c + 1], self.board))
+                if c - 1 >= 0:
+                    if self.get_piece_colour([r - 1, c - 1]) == 'black':
+                        if not piece_clouee or pin_direction == (-1, -1):
+                            moves.append(Move([r, c], [r - 1, c - 1], self.board))
+        if colour == 'black':
+            if 0 <= r <= 7 and 0 <= c <= 7 :
+                if len(self.move_LOG) != 0:
+                    if self.move_LOG[-1].is_pawn_charge :
+                        if (self.move_LOG[-1].end_col == c + 1 or self.move_LOG[-1].end_col == c - 1) and \
+                        r == 4:
+                            moves.append(
+                                Move([r, c],
+                                     [self.move_LOG[-1].end_row + 1, self.move_LOG[-1].end_col],
+                                     self.board,
+                                     False,
+                                     False,
+                                     True ))
+                    if r != 7 :
+                        if self.board[r + 1][c] == 'EmptySquare' :
+                            if not piece_clouee or pin_direction == (1, 0):
+                                moves.append(Move([r, c], [r + 1, c], self.board))
+                        if r == 1 and self.board[r + 2][c] == 'EmptySquare':
+                            if not piece_clouee or pin_direction == (1, 0):
+                                moves.append(Move([r, c], [r + 2, c], self.board, False,True))
+                        if c + 1 <= 7:
+                            if self.get_piece_colour([r + 1, c + 1]) == 'white':
+                                if not piece_clouee or pin_direction == (1, 1):
+                                    moves.append(Move([r, c], [r + 1, c + 1], self.board))
+                        if c - 1 >= 0:
+                            if self.get_piece_colour([r + 1, c - 1]) == 'white':
+                                if not piece_clouee or pin_direction == (1, -1):
+                                    moves.append(Move([r, c], [r + 1, c - 1], self.board))
 
     def get_Knight_moves(self, r, c, moves, colour):
         piece_clouee = False
@@ -797,7 +840,7 @@ class Move:
         self.is_roque = is_roque
         self.is_pawn_charge = is_pawn_charge
         self.is_en_passant = is_en_passant
-        self.is_promotion = is_promoiton
+        self.is_promotion = is_promotion
 
     '''
     Nous devons comparer les les Moves générés par les clics et les moves autorisés générés par le jeu. 

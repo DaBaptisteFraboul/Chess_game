@@ -137,6 +137,12 @@ class Game :
                                 self.player_clicks = []  # deselect
                                 self.selected_case = ()
 
+                            if self.board.ongoing_promotion:
+                                self.board.draw_board(self.window)
+                                self.board.draw_pieces(self.window)
+                                promotion_square = (self.board.move_LOG[-1].end_row * 64 + constants.board_offset[1],
+                                                    self.board.move_LOG[-1].end_col * 64 + constants.board_offset[0])
+                                self.board.set_promotion_menu(self.window, promotion_square)
 
                             else:
                                 self.player_clicks = []  # deselect
@@ -149,7 +155,7 @@ class Game :
 
                 if self.move_made:
                     # while god_mode, u skip opponent turn
-                    if self.god_mod :
+                    if not self.god_mod :
                         self.board.next_color()
                     self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
 
@@ -198,7 +204,10 @@ class Game :
     La boucle update nous servira à faire des mise à jour automatique en fonction des changement d'état
     '''
     def update(self):
+        # On coupe la promotion dans une boucle sur laquelle le joueur agit à part
         pass
+
+
 
     '''
     La boucle display nous permet la gestion des élémetns graphique et des layers d'affichage
