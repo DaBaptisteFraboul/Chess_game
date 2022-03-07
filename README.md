@@ -11,7 +11,7 @@ Roadmap of implementations to make :
   
     ✅ Castling move 
     ✅ En-passant move 
-    🟧 Pawn promotion
+    ✅ Pawn promotion
     ✅ Pieces moves
       ✅ Knight moves
       ✅ King moves
