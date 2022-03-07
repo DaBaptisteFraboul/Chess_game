@@ -117,7 +117,8 @@ class ChessBoard:
         self.board = constants.starting_position
 
     def set_promotion_menu(self, screen, promotion_square):
-
+        piece_square = (self.move_LOG[-1].end_row,
+                        self.move_LOG[-1].end_col)
         if self.colour_to_play == 'white' :
             rock_image = constants.Images['white_rock']
             bishop_image = constants.Images['white_bishop']
@@ -172,6 +173,19 @@ class ChessBoard:
                 if event.type == pygame.MOUSEBUTTONDOWN :
                     if event.button == 1 :
                         click = True
+
+                    if click and queen_rect.collidepoint(mx,my) :
+                        self.board[piece_square[0]][piece_square[1]] = self.colour_to_play + '_queen'
+                        self.ongoing_promotion = False
+                    if click and rock_rect.collidepoint(mx, my) :
+                        self.board[piece_square[0]][piece_square[1]] = self.colour_to_play + '_rock'
+                        self.ongoing_promotion = False
+                    if click and knight_rect.collidepoint(mx, my) :
+                        self.board[piece_square[0]][piece_square[1]] = self.colour_to_play + '_knight'
+                        self.ongoing_promotion = False
+                    if click and bishop_rect.collidepoint(mx, my) :
+                        self.board[piece_square[0]][piece_square[1]] = self.colour_to_play + '_bishop'
+                        self.ongoing_promotion = False
 
 
 
