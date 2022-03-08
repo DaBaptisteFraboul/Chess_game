@@ -839,6 +839,98 @@ class ChessBoard:
         # check that castling cases are EmptySquare
         # le roque contient deux moves"""
 
+    def capture_LOG(self):
+        capture_LOG = []
+        for move in self.move_LOG :
+            capture_LOG.append(move.captured_piece)
+        return capture_LOG
+
+    def get_FEN(self):
+        FEN = ""
+        for row in range(8) :
+            row_notation = ""
+            empty_spaces = 0
+            for col in range(8) :
+                if self.board[row][col] == 'EmptySquare' :
+                    empty_spaces += 1
+                    if col == 7 :
+                        row_notation += str(empty_spaces)
+                else :
+                    if empty_spaces != 0 :
+                        row_notation += str(empty_spaces)
+                        empty_spaces = 0
+                    if self.board[row][col] == 'white_rock' :
+                        row_notation += 'R'
+                    if self.board[row][col] == 'white_knight':
+                        row_notation += 'N'
+                    if self.board[row][col] == 'white_bishop':
+                        row_notation += 'B'
+                    if self.board[row][col] == 'white_king':
+                        row_notation += 'K'
+                    if self.board[row][col] == 'white_queen':
+                        row_notation += 'Q'
+                    if self.board[row][col] == 'white_pawn':
+                        row_notation += 'P'
+                    if self.board[row][col] == 'black_rock' :
+                        row_notation += 'r'
+                    if self.board[row][col] == 'black_knight':
+                        row_notation += 'n'
+                    if self.board[row][col] == 'black_bishop':
+                        row_notation += 'b'
+                    if self.board[row][col] == 'black_king':
+                        row_notation += 'k'
+                    if self.board[row][col] == 'black_queen':
+                        row_notation += 'q'
+                    if self.board[row][col] == 'black_pawn':
+                        row_notation += 'p'
+
+            if row != 7 :
+                row_notation += "/"
+            FEN += row_notation
+
+        if self.colour_to_play == 'white' :
+            FEN += " w"
+        else :
+            FEN += " b"
+        roques = " "
+        if self.current_roques_autorisation.white_petit_roque :
+            roques += 'K'
+        if self.current_roques_autorisation.white_grand_roque :
+            roques += 'Q'
+        if self.current_roques_autorisation.black_petit_roque :
+            roques += 'k'
+        if self.current_roques_autorisation.black_grand_roque :
+            roques += 'q'
+        if roques == ' ':
+            roques == '-'
+        FEN += roques
+        moves = self.get_Valid_moves(self.colour_to_play)
+        can_passant = False
+        for move in moves :
+            if move.is_en_passant :
+                case = move.getLetterRow(move.end_row, move.end_col)
+                FEN += ' ' + case
+                can_passant = True
+        if not can_passant :
+            FEN += ' -'
+        captures = self.capture_LOG()
+        move_from_last_capture = 0
+        for i in range(len(captures) -1, -1, -1) :
+            if captures[i] == 'EmptySquare':
+                move_from_last_capture += 1
+            else :
+                break
+        FEN += ' ' + str(move_from_last_capture)
+
+        FEN += ' ' + str(math.trunc(len(self.move_LOG) / 2))
+
+        return FEN
+
+
+
+
+
+
 
 class Move:
     # contient les éléments d'un seul coup d'échec (pièces de départ et d'arrivée + le bord)

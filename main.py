@@ -197,6 +197,10 @@ class Game :
                     for moves in self.Valid_moves:
                         print(moves.is_roque)
 
+                if event.key == pygame.K_f :
+                    fen = self.board.get_FEN()
+                    print(fen)
+
             self.handle_click_event(event)
 
 
