@@ -1,12 +1,10 @@
-import math
-
 from stockfish import Stockfish
 
-stockfish = Stockfish(path="D:/Stockfish/stockfish_14.1_win_x64_popcnt.exe")
+stockfish = Stockfish(path="stockfish_14.1_win_x64_popcnt/stockfish_14.1_win_x64_popcnt.exe")
 
-stockfish.set_fen_position("2r3k1/1p2Qpp1/p2Pq3/P1p5/2P4P/4p3/6P1/4R2K w - - 1 34")
+def computer_move() :
+    AI_move = stockfish.get_best_move()
+    print(AI_move)
 
-best_move = stockfish.get_best_move()
-print(3 / 2)
-print(math.trunc(7/2))
-print(best_move)
+stockfish.set_fen_position("rnbqkbnr/ppp1pppp/8/3p4/4P3/3B4/PPPP1PPP/RNBQK1NR b KQkq - 3 1")
+computer_move()
