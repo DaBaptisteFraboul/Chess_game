@@ -43,6 +43,7 @@ Roadmap of implementations to make :
   ⭐ Miscellaneous :
   
     🟧 FEN notation loading/writing of position
+      (Retake on it)
     ⬜ Algebrical notation of the game
     ⬜ Position loading
     ⬜ Drag and drop implementation
