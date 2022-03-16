@@ -1,12 +1,12 @@
-import math
-
+import chess_engine as engine
 from stockfish import Stockfish
 
-stockfish = Stockfish(path="D:/Stockfish/stockfish_14.1_win_x64_popcnt.exe")
+class Chess_Ai:
+    def __init__(self):
+        self.stockfish  =  Stockfish(path="D:/Stockfish/stockfish_14.1_win_x64_popcnt.exe")
 
-stockfish.set_fen_position("2r3k1/1p2Qpp1/p2Pq3/P1p5/2P4P/4p3/6P1/4R2K w - - 1 34")
-
-best_move = stockfish.get_best_move()
-print(3 / 2)
-print(math.trunc(7/2))
-print(best_move)
+    def do_best_move(self,fen_notation):
+        self.stockfish.set_fen_position(fen_notation)
+        notation = self.stockfish.get_best_move()
+        move = engine.algebric_to_Move(notation)
+        return move

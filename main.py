@@ -5,23 +5,7 @@ import pygame
 import chess_engine
 import sys, time
 import constants
-
-
-class FramerateExample:
-    def __init__(self):
-        self.previousTime = time.time()
-        """
-        Il faut mettre self.now, self.dt et self.previousTime dans la boucle self.Run() du jeu
-        """
-        self.now = time.time() # on génère le temps de la frame
-        self.dt = self.now - self.previousTime #on calcule le delta T de l'ancienne frame
-        self.previousTime = self.now # le temps actuel est le temps de l'ancienne frame
-        self.clock = pygame.time.Clock()
-        """
-        Tous les concepts frames dépendants doivent être multipliés par self.dt (animation, vélocité etc.) et le frameRATE
-        comme le delta normal est 1/60 * 60, lorsque dt augmente l'animation ou la vélocité compense la perte de framerate
-        """
-        self.clock.get_fps()
+import stockfish_integration as ai
 
 
 #Taille finale de l'application (704,768), taille de l'échiquier (512,512)
@@ -60,6 +44,11 @@ class Game :
         # for debugging purpose :
 
         self.god_mod = False
+
+        # chess Ai
+        self.AI = ai.Chess_Ai
+        self.computer_move = None
+
 
     def final_screen(self):
         """
@@ -125,11 +114,13 @@ class Game :
                         if self.board.get_piece_colour(self.player_clicks[0]) == self.board.colour_to_play:
 
                             move = chess_engine.Move(self.player_clicks[0], self.player_clicks[1], self.board.board)
+                            print()
                             if self.board.get_piece_type(self.player_clicks[0]) == 'king' and\
                                 self.player_clicks[0][1] - self.player_clicks[1][1] != 1 :
                                     move.is_roque = True
 
-                            if move in self.Valid_moves:
+                            if move in self.Valid_moves :
+                                print(move)
                                 if move.is_pawn_charge :
                                     print('charge')
                                 self.board.Make_Move(move)
@@ -199,10 +190,15 @@ class Game :
 
                 if event.key == pygame.K_f :
                     fen = self.board.get_FEN()
-                    print(fen)
+                    self.computer_move = self.AI.do_best_move(self.AI, fen)
 
-            self.handle_click_event(event)
 
+            if not self.computer_move :
+                self.handle_click_event(event)
+            else :
+                self.board.Make_Move(self.computer_move)
+                self.board.next_color()
+                self.computer_move = None
 
     '''
     La boucle update nous servira à faire des mise à jour automatique en fonction des changement d'état
