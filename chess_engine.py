@@ -1020,17 +1020,17 @@ class Roque_Autorisation:
             if (move.start_row, move.start_col) == (0, 7):
                 self.black_petit_roque = False
 
-def algebric_to_Move(algebric_notation) :
+def algebric_to_Move(algebric_notation, board) :
     letter_to_col = {"h": 7, "g": 6, "f": 5, "e": 4, "d": 3,
                      "c": 2, "b": 1, "a": 0}
     row_to_rank = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3,
                     "6": 2, "7": 1, "8": 0}
     regex_pattern = r"([a-h])([1-8])([a-h])([1-8])"
-    results = re.findall(pattern, move)[0]
+    results = re.findall(regex_pattern, algebric_notation)[0]
     start_col = letter_to_col[results[0]]
     start_row = row_to_rank[results[1]]
     end_col = letter_to_col[results[2]]
     end_row = row_to_rank[results[3]]
-
-    computer_move = Move([start_row, start_col],[end_row, end_col])
+    print(((start_row,start_col),(end_row,end_col)))
+    computer_move = Move([start_row, start_col],[end_row, end_col],board)
     return computer_move

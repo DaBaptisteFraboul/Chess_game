@@ -46,7 +46,7 @@ class Game :
         self.god_mod = False
 
         # chess Ai
-        self.AI = ai.Chess_Ai
+
         self.computer_move = None
 
 
@@ -120,7 +120,6 @@ class Game :
                                     move.is_roque = True
 
                             if move in self.Valid_moves :
-                                print(move)
                                 if move.is_pawn_charge :
                                     print('charge')
                                 self.board.Make_Move(move)
@@ -190,7 +189,8 @@ class Game :
 
                 if event.key == pygame.K_f :
                     fen = self.board.get_FEN()
-                    self.computer_move = self.AI.do_best_move(self.AI, fen)
+                    self.computer_move = ai.do_best_move(fen, self.board.board)
+
 
 
             if not self.computer_move :
