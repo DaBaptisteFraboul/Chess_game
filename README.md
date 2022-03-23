@@ -11,7 +11,7 @@ Roadmap of implementations to make :
   
     ✅ Castling move 
     ✅ En-passant move 
-    🟧 Pawn promotion
+    ✅ Pawn promotion
     ✅ Pieces moves
       ✅ Knight moves
       ✅ King moves
@@ -42,7 +42,8 @@ Roadmap of implementations to make :
     
   ⭐ Miscellaneous :
   
-    ⬜ FEN notation loading/writing of position
+    🟧 FEN notation loading/writing of position
+      (Retake on it)
     ⬜ Algebrical notation of the game
     ⬜ Position loading
     ⬜ Drag and drop implementation

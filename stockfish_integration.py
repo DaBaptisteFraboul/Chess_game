@@ -10,5 +10,3 @@ def do_best_move( fen_notation, board):
     notation = stockfish.get_best_move()
     move = engine.algebric_to_Move(notation, board)
     return move
-
-

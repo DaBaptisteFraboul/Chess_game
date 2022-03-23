@@ -904,14 +904,17 @@ class ChessBoard:
         if roques == ' ':
             roques == '-'
         FEN += roques
-        moves = self.get_Valid_moves(self.colour_to_play)
-        can_passant = False
-        for move in moves :
-            if move.is_en_passant :
-                case = move.getLetterRow(move.end_row, move.end_col)
-                FEN += ' ' + case
-                can_passant = True
-        if not can_passant :
+        if  self.move_LOG != [] :
+            last_move = self.move_LOG[-1]
+            if last_move.is_pawn_charge :
+                if self.colour_to_play == 'white' :
+                    case = last_move.getLetterRow(last_move.end_row - 1, last_move.end_col)
+                if self.colour_to_play == 'black' :
+                    case = last_move.getLetterRow(last_move.end_row + 1, last_move.end_col)
+                FEN += ' '+ case
+            else :
+                FEN +=' -'
+        else :
             FEN += ' -'
         captures = self.capture_LOG()
         move_from_last_capture = 0
