@@ -3,8 +3,30 @@ This file contains the constant variable of the application and chess game,
 its purpose is to maintain code clear and readable
 """
 import pygame
-import pygame_loading
+
 pygame.font.init()
+
+def load_pieces_images() :
+    Images = {}
+    pieces = ['black_pawn',
+              'black_king',
+              'black_queen',
+              'black_rock',
+              'black_knight',
+              'black_bishop',
+              'white_pawn',
+              'white_rock',
+              'white_knight',
+              'white_bishop',
+              'white_queen',
+              'white_king',
+              'EmptySquare']
+
+    for piece in pieces :
+        Images[piece] = pygame.image.load("assets/board/export/pieces/02/" + piece + ".png")
+        Images[piece] = pygame.transform.scale(Images[piece], (64,64))
+
+    return Images
 
 
 name = "Chess"
@@ -26,7 +48,7 @@ starting_position = [
 
 # Constant UI-related
 
-Images = pygame_loading.load_pieces_images()
+Images = load_pieces_images()
 
 image_overlay = pygame.image.load("assets/board/export/valid_move_text.png")
 

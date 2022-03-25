@@ -2,7 +2,6 @@
 import pygame
 import math
 import constants
-import stockfish_integration as ai
 import re
 # import images in variables
 import stockfish as sf

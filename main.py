@@ -5,7 +5,7 @@ import pygame
 import chess_engine
 import sys, time
 import constants
-import stockfish_integration as ai
+
 
 #Taille finale de l'application (704,768), taille de l'échiquier (512,512)
 class Game :
