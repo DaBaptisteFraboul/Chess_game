@@ -2,12 +2,19 @@
 import pygame
 import math
 import constants
-import stockfish_integration as ai
 import re
 # import images in variables
-
+import stockfish as sf
 
 class ChessBoard:
+    """
+    This class is used to interact with the rules of chess and manipulation the board.
+    It does contains :
+        - the board and methods to parse it
+        - the moveLog that resume the state of the game
+        - the stockfish ai to play with the computer
+
+    """
     def __init__(self):
         self.image = pygame.image.load("assets/board/export/chessboard_tex.png")
         self.rect = self.image.get_rect()
@@ -52,6 +59,7 @@ class ChessBoard:
                                                            self.current_roques_autorisation.black_grand_roque)]
         self.ongoing_promotion = False
         self.promotion_list = []
+        self.stockfish = sf.Stockfish(path="stockfish_14.1_win_x64_popcnt/stockfish_14.1_win_x64_popcnt.exe")
 
     def next_color(self):
         if self.colour_to_play == "white":
@@ -650,7 +658,7 @@ class ChessBoard:
                         if self.board[r + 1][c] == 'EmptySquare' :
                             if not piece_clouee or pin_direction == (1, 0):
                                 moves.append(Move([r, c], [r + 1, c], self.board))
-                        if r == 1 and self.board[r + 2][c] == 'EmptySquare':
+                        if r == 1 and (self.board[r + 2][c] == 'EmptySquare' and self.board[r+1][c] == 'EmptySquare'):
                             if not piece_clouee or pin_direction == (1, 0):
                                 charge = Move([r, c], [r + 2, c], self.board, False,True)
                                 moves.append(Move([r, c], [r + 2, c], self.board, False,True))
@@ -929,8 +937,50 @@ class ChessBoard:
 
         return FEN
 
+
+
+    def algebric_to_Move(self,algebric_notation):
+        letter_to_col = {"h": 7, "g": 6, "f": 5, "e": 4, "d": 3,
+                         "c": 2, "b": 1, "a": 0}
+        row_to_rank = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3,
+                       "6": 2, "7": 1, "8": 0}
+        print(algebric_notation)
+        if len(algebric_notation) == 4:
+            regex_pattern = r"([a-h])([1-8])([a-h])([1-8])"
+            results = re.findall(regex_pattern, algebric_notation)[0]
+            start_col = letter_to_col[results[0]]
+            start_row = row_to_rank[results[1]]
+            end_col = letter_to_col[results[2]]
+            end_row = row_to_rank[results[3]]
+            colour = self.get_piece_colour([start_row, start_col])
+            type = self.get_piece_type([start_row, start_col])
+            roque = False
+            if type == 'king' :
+                if end_col -start_col == 2 :
+                    # petit roque
+                    roque = True
+                if end_col - start_col == -2 :
+                    # grand roque
+                    roque = True
+            computer_move = Move([start_row, start_col], [end_row, end_col], self.board, is_roque=roque, is_cpu_move=True )
+            return computer_move
+        if len(algebric_notation) == 5 :
+            print(algebric_notation)
+
+        # fprint(((start_row,start_col),(end_row,end_col)))
+
+
+    def do_best_move(self, fen_notation):
+        self.stockfish.set_fen_position(fen_notation)
+        notation = self.stockfish.get_best_move()
+        move = self.algebric_to_Move(notation)
+        return move
+
 class Move:
-    # contient les éléments d'un seul coup d'échec (pièces de départ et d'arrivée + le bord)
+    '''
+    This class contains all elements defining a chess move.
+    It must be modified with further implementation (i.e. computer moves)
+    '''
     ranks_to_row = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3,
                     "6": 2, "7": 1, "8": 0}
     row_to_ranks = {v: k for k, v in ranks_to_row.items()}
@@ -938,7 +988,7 @@ class Move:
                      "c": 2, "b": 1, "a": 0}
     letter_to_col = {v: k for k, v in col_to_letter.items()}
 
-    def __init__(self, start_sq, end_sq, board, is_roque = False, is_pawn_charge = False, is_en_passant = False, is_promotion = False):
+    def __init__(self, start_sq, end_sq, board, is_roque = False, is_pawn_charge = False, is_en_passant = False, is_promotion = False, is_cpu_move = False):
         self.start_row = start_sq[0]
         self.start_col = start_sq[1]
         self.end_row = end_sq[0]
@@ -950,6 +1000,8 @@ class Move:
         self.is_pawn_charge = is_pawn_charge
         self.is_en_passant = is_en_passant
         self.is_promotion = is_promotion
+        self.is_cpu_move = is_cpu_move
+        self.cpu_promotion = None
 
     '''
     Nous devons comparer les les Moves générés par les clics et les moves autorisés générés par le jeu. 
@@ -1023,17 +1075,4 @@ class Roque_Autorisation:
             if (move.start_row, move.start_col) == (0, 7):
                 self.black_petit_roque = False
 
-def algebric_to_Move(algebric_notation, board) :
-    letter_to_col = {"h": 7, "g": 6, "f": 5, "e": 4, "d": 3,
-                     "c": 2, "b": 1, "a": 0}
-    row_to_rank = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3,
-                    "6": 2, "7": 1, "8": 0}
-    regex_pattern = r"([a-h])([1-8])([a-h])([1-8])"
-    results = re.findall(regex_pattern, algebric_notation)[0]
-    start_col = letter_to_col[results[0]]
-    start_row = row_to_rank[results[1]]
-    end_col = letter_to_col[results[2]]
-    end_row = row_to_rank[results[3]]
-    print(((start_row,start_col),(end_row,end_col)))
-    computer_move = Move([start_row, start_col],[end_row, end_col],board)
-    return computer_move
+

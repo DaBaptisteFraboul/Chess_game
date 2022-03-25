@@ -6,15 +6,14 @@ import chess_engine
 import sys, time
 import constants
 
+
 #Taille finale de l'application (704,768), taille de l'échiquier (512,512)
 class Game :
     """
     Cette classe contient l'affichage de la partie d'échecs
     Je dois encore clarifier comment le faire proprement, pour l'instant il s'agit également de la gestion de l'application
-
-
-
     """
+
     def __init__(self):
         # classic pygame stuff
         self.window_size = (704,768)
@@ -187,7 +186,10 @@ class Game :
 
                 if event.key == pygame.K_f :
                     fen = self.board.get_FEN()
-                    self.computer_move = ai.do_best_move(fen, self.board.board)
+                    self.computer_move = self.board.do_best_move(fen)
+
+                if event.key == pygame.K_b :
+                    print(self.board.board)
 
 
 
@@ -197,6 +199,9 @@ class Game :
                 self.board.Make_Move(self.computer_move)
                 self.board.next_color()
                 self.computer_move = None
+                self.move_made = False
+                self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
+
 
     '''
     La boucle update nous servira à faire des mise à jour automatique en fonction des changement d'état
