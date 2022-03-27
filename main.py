@@ -4,11 +4,13 @@ import math
 import pygame
 import chess_engine
 import sys, time
-import constants
 
+import chess_globals_variable
+import constants
+import Menus
 
 #Taille finale de l'application (704,768), taille de l'échiquier (512,512)
-class Game :
+class Application :
     """
     Cette classe contient l'affichage de la partie d'échecs
     Je dois encore clarifier comment le faire proprement, pour l'instant il s'agit également de la gestion de l'application
@@ -17,13 +19,17 @@ class Game :
     def __init__(self):
         # classic pygame stuff
         self.window_size = (704,768)
-        self.window = pygame.display.set_mode(self.window_size)
+        #self.screen_surface = pygame.Surface(self.window_size, flags=pygame.SRCALPHA)
+        self.window = pygame.display.set_mode(self.window_size, flags=pygame.SRCALPHA)
         pygame.display.set_caption("Chess game!")
+
         self.running = True
+
         self.clock = pygame.time.Clock()
 
         self.board = chess_engine.ChessBoard()
         self.board.set_starting_position()
+
 
         # gestion des moves légaux
         self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
@@ -45,38 +51,33 @@ class Game :
         # chess Ai
 
         self.computer_move = None
+        self.game = Menus.ChessGame(self.window)
 
 
-    def final_screen(self):
+
+
+
+
+    def run(self):
         """
-        Unused To replace, doesnt work, I must understand to display font in pygame before trying to implement it into
-        my application ofc.
+        Fait tourner l'application
 
         :return:
         """
-        running = True
-        window = pygame.display.set_mode(self.window_size)
-        message_rect = pygame.Rect((10,256),(64, 256))
-        if self.board.pat :
-            text = 'Stalemate, no one won the game'
-        if self.board.checkmate :
-            winner = self.board.opponent_colour(self.board.colour_to_play)
-            text = winner + " have won the game by checkmate"
-        message = constants.Arial_font.render(text, True, 'Red', (0, 0, 0))
-        while running :
-            for event in pygame.event.get():
-                if event.type == pygame.K_ESCAPE :
-                    sys.exit()
-            window.blit(message,message_rect)
 
+        self.game.run()
+
+
+if __name__ == '__main__' :
+    test = Application()
+    test.run()
+
+
+"""
     def is_inside_board (self, x, y) :
-        """
-        Cette méthode permet de vérifier si le les coordonées x et y sont bien dans l'échiquier par
-        rapport à l'UI de l'application
-        :param x:
-        :param y:
-        :return:
-        """
+        
+        
+        
         if 64 < x < 576 and 128 < y < 640 :
             return True
         else :
@@ -85,9 +86,7 @@ class Game :
     Permet la gestion dela boucle d'events, tout ce qui est input du joueur est géré ici
     '''
     def handle_click_event(self, event):
-        """
-        gestion des clics de la souris
-        """
+       
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             # clic droit détecté
@@ -217,10 +216,7 @@ class Game :
     '''
 
     def display(self):
-        """
-        Gère l'affichage des éléments à l'écran, notez bien que l'ordre des commandes correspond à l'ordre,
-        arrière plan / premier plan
-        """
+        
         self.window.fill(constants.default_color)
         self.window.blit(pygame.image.load("assets/board/export/Application_bg.png"),(0,0))
         self.board.draw_board(self.window)
@@ -242,20 +238,4 @@ class Game :
 
         pygame.display.flip()
 
-
-
-    def run(self):
-        """
-        Fait tourner l'application
-
-        :return:
-        """
-        while self.running :
-            self.events()
-            self.update()
-            self.display()
-            self.clock.tick(constants.FPS)
-
-if __name__ == '__main__' :
-    test = Game()
-    test.run()
+"""
