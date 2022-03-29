@@ -23,7 +23,7 @@ def load_pieces_images() :
               'EmptySquare']
 
     for piece in pieces :
-        Images[piece] = pygame.image.load("assets/board/export/pieces/02/" + piece + ".png")
+        Images[piece] = pygame.image.load("assets/board/export/pieces/03/" + piece + ".png")
         Images[piece] = pygame.transform.scale(Images[piece], (64,64))
 
     return Images

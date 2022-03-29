@@ -112,13 +112,15 @@ class MainMenu(Menu) :
                 #Do some shit
 
 class PauseMenu(Menu):
-    def __init__(self, screen):
+    def __init__(self, screen, pause_bg):
         super().__init__(screen)
         print(self.is_running)
         self.color = pygame.Color(125,125,135,a = 125)
         self.surface = pygame.Surface((300,500), flags=pygame.SRCALPHA)
         self.surface.fill(self.color)
         self.surface.set_alpha(200)
+        self.pause_bg = pause_bg
+
     def handle_keyboard_events(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
@@ -146,6 +148,7 @@ class PauseMenu(Menu):
     def display(self):
         #self.screen.blit(pygame.image.load("assets/board/export/Application_bg.png"), (0, 0))
         #self.screen.fill(pygame.Color(125,125,125,a=125),pygame.Rect(20,50,200,500))
+        self.screen.blit(self.pause_bg, (0,0))
         self.screen.blit(self.surface,(10,10))
         pygame.display.flip()
 
@@ -162,7 +165,8 @@ class ChessGame(Menu) :
         super().__init__(screen)
         self.board = chess_engine.ChessBoard()
         self.board.set_starting_position()
-
+        self.left_ui = pygame.image.load('assets/board/export/Left_UI.png')
+        self.left_ui = pygame.transform.scale(self.left_ui, (64,768))
         self.god_mod = False
 
         self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
@@ -171,7 +175,9 @@ class ChessGame(Menu) :
         self.player_clicks = []
         self.selected_case = ()
         self.computer_move = None
-        self.pause = PauseMenu(self.screen)
+        self.pause_bg = None
+        self.pause = PauseMenu(self.screen, self.pause_bg)
+
         # variable used to avoid to recalculate moves every frames
 
     def is_inside_board (self, x, y) :
@@ -231,6 +237,9 @@ class ChessGame(Menu) :
                 print(self.board.board)
 
             if event.key == pygame.K_p :
+                pygame.image.save(self.screen,"pause_screen.png")
+                self.pause_bg = pygame.image.load("pause_screen.png")
+                self.pause = PauseMenu(self.screen, self.pause_bg)
                 self.pause.is_running = True
                 self.pause.run()
                 print(self.is_running)
@@ -305,7 +314,8 @@ class ChessGame(Menu) :
         arrière plan / premier plan
         """
         self.screen.fill(constants.default_color)
-        self.screen.blit(pygame.image.load("assets/board/export/Application_bg.png"), (0, 0))
+        self.screen.blit(pygame.image.load("assets/board/export/Application_bg.png"),(0,0))
+        self.screen.blit(self.left_ui, (0,0))
         self.board.draw_board(self.screen)
         self.board.draw_pieces(self.screen)
         if self.player_clicks != []:
