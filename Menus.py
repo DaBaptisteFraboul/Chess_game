@@ -165,7 +165,8 @@ class ChessGame(Menu) :
         super().__init__(screen)
         self.board = chess_engine.ChessBoard()
         self.board.set_starting_position()
-
+        self.left_ui = pygame.image.load('assets/board/export/Left_UI.png')
+        self.left_ui = pygame.transform.scale(self.left_ui, (64,768))
         self.god_mod = False
 
         self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
@@ -313,7 +314,8 @@ class ChessGame(Menu) :
         arrière plan / premier plan
         """
         self.screen.fill(constants.default_color)
-        self.screen.blit(pygame.image.load("assets/board/export/Application_bg.png"), (0, 0))
+        self.screen.blit(pygame.image.load("assets/board/export/Application_bg.png"),(0,0))
+        self.screen.blit(self.left_ui, (0,0))
         self.board.draw_board(self.screen)
         self.board.draw_pieces(self.screen)
         if self.player_clicks != []:
