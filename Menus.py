@@ -73,6 +73,7 @@ class Menu:
             self.update()
             self.display()
             self.clock.tick(60)
+            print(self.clock.get_fps())
 
 
 
@@ -167,6 +168,9 @@ class ChessGame(Menu) :
         self.board.set_starting_position()
         self.left_ui = pygame.image.load('assets/board/export/Left_UI.png')
         self.left_ui = pygame.transform.scale(self.left_ui, (64,768))
+        self.right_ui = pygame.image.load('assets/board/export/Right_Ui.png')
+        self.right_ui = pygame.transform.scale(self.right_ui, (128,768))
+        self.right_ui_pos = (576,0)
         self.god_mod = False
 
         self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
@@ -315,6 +319,7 @@ class ChessGame(Menu) :
         """
         self.screen.fill(constants.default_color)
         self.screen.blit(pygame.image.load("assets/board/export/Application_bg.png"),(0,0))
+        self.screen.blit(self.right_ui, self.right_ui_pos)
         self.screen.blit(self.left_ui, (0,0))
         self.board.draw_board(self.screen)
         self.board.draw_pieces(self.screen)
