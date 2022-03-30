@@ -73,6 +73,7 @@ class Menu:
             self.update()
             self.display()
             self.clock.tick(60)
+            print(self.clock.get_fps())
 
 
 
@@ -167,6 +168,13 @@ class ChessGame(Menu) :
         self.board.set_starting_position()
         self.left_ui = pygame.image.load('assets/board/export/Left_UI.png')
         self.left_ui = pygame.transform.scale(self.left_ui, (64,768))
+        self.right_ui = pygame.image.load('assets/board/export/Right_Ui.png')
+        self.right_ui = pygame.transform.scale(self.right_ui, (128,768))
+        self.screen_ui = pygame.image.load('assets/board/export/Screen_UI.png')
+        self.screen_ui = pygame.transform.scale(self.screen_ui,(512, 128))
+        self.board_ui = pygame.image.load('assets/board/export/chessboard_tex.png')
+        self.board_ui = pygame.transform.scale(self.board_ui, (512,512))
+        self.right_ui_pos = (576,0)
         self.god_mod = False
 
         self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
@@ -310,12 +318,15 @@ class ChessGame(Menu) :
 
     def display(self):
         """
-        Gère l'affichage des éléments à l'écran, notez bien que l'ordre des commandes correspond à l'ordre,
-        arrière plan / premier plan
+        Gère l'affichage des éléments à l'écran, notez bien que l'ordre des méthodes correspond à l'ordre des calques :
+        arrière plan => premier plan
         """
         self.screen.fill(constants.default_color)
         self.screen.blit(pygame.image.load("assets/board/export/Application_bg.png"),(0,0))
+        self.screen.blit(self.right_ui, self.right_ui_pos)
         self.screen.blit(self.left_ui, (0,0))
+        self.screen.blit(self.screen_ui, (64,0))
+        self.screen.blit(self.screen_ui, (64,640))
         self.board.draw_board(self.screen)
         self.board.draw_pieces(self.screen)
         if self.player_clicks != []:

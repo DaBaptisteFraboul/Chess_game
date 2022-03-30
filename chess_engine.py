@@ -17,6 +17,7 @@ class ChessBoard:
     """
     def __init__(self):
         self.image = pygame.image.load("assets/board/export/chessboard_tex.png")
+        self.image = pygame.transform.scale(self.image, (512,512))
         self.rect = self.image.get_rect()
         self.board = [
             ["EmptySquare", "EmptySquare", "EmptySquare", "EmptySquare", "EmptySquare", "EmptySquare", "EmptySquare",
