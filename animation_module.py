@@ -28,7 +28,6 @@ class Sprite_sheet():
         return sprite
 
 
-
     def get_sprite_data(self, name):
         '''
         cette méthode permet d'obtenir les coordonnées de l'image dans la sprite sheet
@@ -40,8 +39,7 @@ class Sprite_sheet():
 
     def image(self, name):
         """
-        cette fonction permet d'obtenir l'image coresspondant au nom de la frame
-
+        cette fonction permet d'obtenir l'image coresspondant au nom de la framef
         """
         x, y, w, h = self.get_sprite_data(name)
         image = self.get_sprite(x, y, w, h)
@@ -61,16 +59,38 @@ class Animation:
         self.index = 0
 
     def draw_frame(self, screen):
-        screen.blit(self.animation[self.index])
+        screen.blit(self.animation[self.index], (0,0))
 
     def update_index(self):
-        pass
+        self.index += 1
+        if self.index > len(self.animation) :
+            self.index = 0
 
 
-test = Sprite_sheet("assets/test_animation/trainer_sheet.png", "assets/test_animation/trainer_sheet.json")
-test.get_frames_name()
 
-runing = True
-window
-while runing :
+
+def run_animation() :
+    spriteheet = Animation("assets/test_animation/trainer_sheet.png", "assets/test_animation/trainer_sheet.json")
+    running = True
+    window = pygame.display.set_mode((256,256))
+    clock = pygame.time.Clock()
+
+    while running :
+
+       spriteheet.sprites_loader.get_frames_arrray()
+       pygame.display.flip()
+       clock.get_fps()
+       for event in pygame.event.get() :
+            if event.type == pygame.QUIT :
+                running = False
+            if event.type == pygame.KEYDOWN :
+                if event.key == pygame.K_SPACE :
+                    print("update")
+                    spriteheet.update_index()
+
+       window.fill('black')
+       window.blit(spriteheet.animation[spriteheet.index], (0,0))
+run_animation()
+
+
 

@@ -3,6 +3,7 @@ import chess_globals_variable
 import constants
 import chess_engine
 import sys
+import time
 
 """
 Une c'est une fonction avec une boucle While runnin avec sa propre variable running
@@ -34,6 +35,9 @@ class Menu:
     - on utilise les variable que dans la boucle bien fermée
     '''
     def __init__(self, screen) :
+        self.previous_time = time.time()
+        self.delta_time = 1/60
+        self.now = time.time()
         self.is_running = True
         self.screen = screen
         self.clock = pygame.time.Clock()
@@ -69,11 +73,15 @@ class Menu:
     def run(self):
          # nécessaire pour réutiliser plusieures fois le menu
         while self.is_running :
+            self.now = time.time()
+            self.delta_time = self.now - self.previous_time
+            self.previous_time = self.now
             self.events()
             self.update()
             self.display()
             self.clock.tick(60)
-            print(self.clock.get_fps())
+
+
 
 
 
@@ -156,6 +164,9 @@ class PauseMenu(Menu):
     def run(self):
          # nécessaire pour réutiliser plusieures fois le menu
         while self.is_running :
+            self.now = time.time()
+            self.delta_time = self.now - self.previous_time
+            self.previous_time = self.now
             self.events()
             self.update()
             self.display()
