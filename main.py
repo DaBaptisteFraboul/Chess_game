@@ -66,6 +66,7 @@ class Application :
         """
 
         self.game.run()
+        self.clock.tick(60)
 
 
 if __name__ == '__main__' :

@@ -1,10 +1,11 @@
+import time
 import pygame
 import json
 
-class Sprite_sheet():
+class SpritesLoader():
     """
-    Permet de charger l'image correspondant à une frame depuis une sprite sheet
-
+    Permet de charger l'image correspondant à une frame depuis une sprite sheet et un fichier json contenant les
+    données de l'animation
     """
 
     def __init__(self, spritesheet, animation_data):
@@ -39,7 +40,7 @@ class Sprite_sheet():
 
     def image(self, name):
         """
-        cette fonction permet d'obtenir l'image coresspondant au nom de la framef
+        Cette fonction permet d'obtenir l'image coresspondant au nom de la frame
         """
         x, y, w, h = self.get_sprite_data(name)
         image = self.get_sprite(x, y, w, h)
@@ -53,43 +54,55 @@ class Sprite_sheet():
         return self.frames_list
 
 class Animation:
+    """
+    Cette classe contient la liste des frames associées à une animation ainsi que des méthodes d'appels
+    """
     def __init__(self, spritesheet, json):
-        self.sprites_loader = Sprite_sheet(spritesheet, json)
-        self.animation = self.sprites_loader.get_frames_arrray()
+        self.sprites_loader = SpritesLoader(spritesheet, json)
+        self.frames = self.sprites_loader.get_frames_arrray()
         self.index = 0
 
-    def draw_frame(self, screen):
-        screen.blit(self.animation[self.index], (0,0))
+    def draw_animation(self, screen):
+        screen.blit(self.frames[int(self.index)], (0, 0))
 
-    def update_index(self):
-        self.index += 1
-        if self.index > len(self.animation) :
+    def update_index(self, delta_time):
+
+        self.index += (60/24) * delta_time
+        if self.index > len(self.frames) :
             self.index = 0
 
 
 
 
 def run_animation() :
+    previous_time = time.time()
+
     spriteheet = Animation("assets/test_animation/trainer_sheet.png", "assets/test_animation/trainer_sheet.json")
     running = True
     window = pygame.display.set_mode((256,256))
     clock = pygame.time.Clock()
 
     while running :
-
-       spriteheet.sprites_loader.get_frames_arrray()
-       pygame.display.flip()
-       clock.get_fps()
-       for event in pygame.event.get() :
+        now = time.time()
+        dt = now - previous_time
+        previous_time = now
+        spriteheet.sprites_loader.get_frames_arrray()
+        pygame.display.flip()
+        clock.get_fps()
+        for event in pygame.event.get() :
             if event.type == pygame.QUIT :
                 running = False
             if event.type == pygame.KEYDOWN :
                 if event.key == pygame.K_SPACE :
-                    print("update")
-                    spriteheet.update_index()
-
-       window.fill('black')
-       window.blit(spriteheet.animation[spriteheet.index], (0,0))
+                    i = 0
+                    while i < 300000 :
+                        i += 1
+                        print(i)
+        spriteheet.update_index(dt)
+        print(clock.get_fps())
+        clock.tick(60)
+        window.fill('black')
+        spriteheet.draw_animation(window)
 run_animation()
 
 
