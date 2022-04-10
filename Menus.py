@@ -73,9 +73,6 @@ class Menu:
             self.update()
             self.display()
             self.clock.tick(60)
-            print(self.clock.get_fps())
-
-
 
 class MainMenu(Menu) :
     """
@@ -162,8 +159,9 @@ class PauseMenu(Menu):
             self.clock.tick(60)
 
 class ChessGame(Menu) :
-    def __init__(self, screen):
+    def __init__(self, screen, player_color = 'white'):
         super().__init__(screen)
+        self.player_color = player_color
         self.board = chess_engine.ChessBoard()
         self.board.set_starting_position()
         self.left_ui = pygame.image.load('assets/board/export/Left_UI.png')
@@ -283,13 +281,12 @@ class ChessGame(Menu) :
                     if len(self.player_clicks) == 2:  # nous sommes après le deuxième clic
                         if self.board.get_piece_colour(self.player_clicks[0]) == self.board.colour_to_play:
                             move = chess_engine.Move(self.player_clicks[0], self.player_clicks[1], self.board.board)
-                            print()
-                            if self.board.get_piece_type(self.player_clicks[0]) == 'king' and \
-                                    self.player_clicks[0][1] - self.player_clicks[1][1] != 1:
-                                move.is_roque = True
+                            #if self.board.get_piece_type(self.player_clicks[0]) == 'king' and \
+                                    #self.player_clicks[0][1] - self.player_clicks[1][1] != 1:
+                               # print(self.player_clicks[1][1] - self.player_clicks[0][1])
+                                #print("roque generated from click")
+                                #move.is_roque = True
                             if move in self.Valid_moves:
-                                if move.is_pawn_charge:
-                                    print('charge')
                                 self.board.Make_Move(move)
                                 self.move_made = True
                                 self.player_clicks = []  # deselect
@@ -340,6 +337,10 @@ class ChessGame(Menu) :
         pygame.display.flip()
 
     def events(self):
+        if self.board.colour_to_play != self.player_color :
+            print("computer is playing")
+            fen = self.board.get_FEN()
+            self.computer_move = self.board.do_best_move(fen)
 
         for events in pygame.event.get():
             self.handle_keyboard_events(events)

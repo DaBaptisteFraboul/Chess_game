@@ -213,14 +213,17 @@ class ChessBoard:
         '''
         Handle Pawn promotion
         '''
-        if move.moved_piece == 'white_pawn' and move.end_row == 0 :
-            move.is_promotion = True
-            self.ongoing_promotion = True
+        if move.is_cpu_move and move.is_promotion:
+            self.board[move.end_row][move.end_col] = move.cpu_promotion
+        else :
+            if move.moved_piece == 'white_pawn' and move.end_row == 0 :
+                move.is_promotion = True
+                self.ongoing_promotion = True
 
-        if move.moved_piece == 'black_pawn' and move.end_row == 7 :
-            print("promotion")
-            move.is_promotion = True
-            self.ongoing_promotion = True
+            if move.moved_piece == 'black_pawn' and move.end_row == 7 :
+                print("promotion")
+                move.is_promotion = True
+                self.ongoing_promotion = True
 
 
 
@@ -240,7 +243,8 @@ class ChessBoard:
         """
         Handle Roque move
         """
-        if move.is_roque == True:
+        if move.is_roque :
+            print("roque_move")
             tower_row = None
             tower_col = None
             tower_colour = None
@@ -349,6 +353,7 @@ class ChessBoard:
 
                     elif type == 'king':
                         self.get_King_moves(rows, c, moves, colour)
+                        #print(self.current_roques_autorisation.print_roques_availables())
                         self.get_Roque_Moves(rows, c, moves, colour)
                 else:
                     pass
@@ -569,13 +574,12 @@ class ChessBoard:
 
             if self.current_roques_autorisation.white_petit_roque:
                 if self.board[r][c + 1] == 'EmptySquare' and self.board[r][c + 2] == 'EmptySquare':
-
                     if  (not self.square_under_attack(r,c + 2, self.colour_to_play) and
                            not self.square_under_attack(r,c + 1,self.colour_to_play)):
-
                         petit_roque = Move([r, c], [r, c + 2], self.board, is_roque= True)
                         moves.append(petit_roque)
-
+            else :
+                pass
         elif colour == 'black':
             king_loc = self.black_king_location
             if self.current_roques_autorisation.black_grand_roque:
@@ -591,6 +595,8 @@ class ChessBoard:
 
                     petit_roque = Move([r, c], [r, c + 2], self.board, is_roque=True)
                     moves.append(petit_roque)
+            else :
+                pass
         else:
             return
 
@@ -945,7 +951,6 @@ class ChessBoard:
                          "c": 2, "b": 1, "a": 0}
         row_to_rank = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3,
                        "6": 2, "7": 1, "8": 0}
-        print(algebric_notation)
         if len(algebric_notation) == 4:
             regex_pattern = r"([a-h])([1-8])([a-h])([1-8])"
             results = re.findall(regex_pattern, algebric_notation)[0]
@@ -964,12 +969,27 @@ class ChessBoard:
                     # grand roque
                     roque = True
             computer_move = Move([start_row, start_col], [end_row, end_col], self.board, is_roque=roque, is_cpu_move=True )
-            return computer_move
+
         if len(algebric_notation) == 5 :
-            print(algebric_notation)
+            regex_pattern = r"([a-h])([1-8])([a-h])([1-8])([qnrb])"
+            results = re.findall(regex_pattern, algebric_notation)[0]
+            start_col = letter_to_col[results[0]]
+            start_row = row_to_rank[results[1]]
+            end_col = letter_to_col[results[2]]
+            end_row = row_to_rank[results[3]]
+            colour = self.get_piece_colour([start_row, start_col])
+            piece_convertion = {"q":"_queen", "n":"_knight", "r":"_tower", "b":"_bishop"}
+            promotion_piece =colour + piece_convertion[results[4]]
+            computer_move = Move([start_row, start_col],
+                                 [end_row, end_col],
+                                 self.board,
+                                 is_roque=False,
+                                 is_cpu_move=True,
+                                 is_promotion=True,
+                                 cpu_promotion = promotion_piece)
 
         # fprint(((start_row,start_col),(end_row,end_col)))
-
+        return computer_move
 
     def do_best_move(self, fen_notation):
         self.stockfish.set_fen_position(fen_notation)
@@ -989,7 +1009,17 @@ class Move:
                      "c": 2, "b": 1, "a": 0}
     letter_to_col = {v: k for k, v in col_to_letter.items()}
 
-    def __init__(self, start_sq, end_sq, board, is_roque = False, is_pawn_charge = False, is_en_passant = False, is_promotion = False, is_cpu_move = False):
+    def __init__(self,
+                 start_sq,
+                 end_sq,
+                 board,
+                 is_roque = False,
+                 is_pawn_charge = False,
+                 is_en_passant = False,
+                 is_promotion = False,
+                 is_cpu_move = False,
+                 cpu_promotion = None):
+
         self.start_row = start_sq[0]
         self.start_col = start_sq[1]
         self.end_row = end_sq[0]
@@ -1002,7 +1032,7 @@ class Move:
         self.is_en_passant = is_en_passant
         self.is_promotion = is_promotion
         self.is_cpu_move = is_cpu_move
-        self.cpu_promotion = None
+        self.cpu_promotion = cpu_promotion
 
     '''
     Nous devons comparer les les Moves générés par les clics et les moves autorisés générés par le jeu. 
@@ -1019,6 +1049,7 @@ class Move:
                 self.is_pawn_charge = other.is_pawn_charge
                 self.is_en_passant = other.is_en_passant
                 self.is_promotion = other.is_promotion
+                self.is_roque = other.is_roque
                 return True
         return False
 
@@ -1048,7 +1079,16 @@ class Roque_Autorisation:
         self.white_petit_roque = white_petit_roque
         self.black_grand_roque = black_grand_roque
         self.black_petit_roque = black_petit_roque
-
+    def print_roques_availables(self):
+        print("-------------------------------")
+        if self.white_grand_roque :
+            print("white grand roque")
+        if self.white_petit_roque :
+            print("white petit roque")
+        if self.black_grand_roque :
+            print("black grand roque")
+        if self.black_petit_roque :
+            print("black petit roque")
     def Update_roque_authorisation(self, move):
         """
         Cette méthode met à jour les autorisations de roque en vérifiant si la pièce bougée  par le correspond au roi

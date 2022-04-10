@@ -9,6 +9,6 @@ move = ("e2e4")
 
 pattern = r"([a-h])([1-8])([a-h])([1-8])"
 
-results = re.findall(pattern, move)[0]
-start_col = letter_to_col[results[0]]
-print(start_col)
+piece_convertion = {"q":"_queen", "n":"_knight", "r":"_tower", "b":"_bishop"}
+
+print(piece_convertion["q"])
