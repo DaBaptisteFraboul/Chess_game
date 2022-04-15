@@ -1,0 +1,50 @@
+{ "frames": {
+   "Quit_button 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 10, "h": 11 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 11 },
+    "sourceSize": { "w": 10, "h": 11 },
+    "duration": 100
+   },
+   "Quit_button 1.aseprite": {
+    "frame": { "x": 10, "y": 0, "w": 10, "h": 11 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 11 },
+    "sourceSize": { "w": 10, "h": 11 },
+    "duration": 100
+   },
+   "Quit_button 2.aseprite": {
+    "frame": { "x": 20, "y": 0, "w": 10, "h": 11 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 11 },
+    "sourceSize": { "w": 10, "h": 11 },
+    "duration": 100
+   },
+   "Quit_button 3.aseprite": {
+    "frame": { "x": 30, "y": 0, "w": 10, "h": 11 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 10, "h": 11 },
+    "sourceSize": { "w": 10, "h": 11 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.28-x64",
+  "image": "Quit_button.png",
+  "format": "RGBA8888",
+  "size": { "w": 40, "h": 11 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

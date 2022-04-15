@@ -4,7 +4,6 @@ import json
 class Sprite_sheet():
     """
     Permet de charger l'image correspondant à une frame depuis une sprite sheet
-
     """
 
     def __init__(self, spritesheet, animation_data):
@@ -55,22 +54,39 @@ class Sprite_sheet():
         return self.frames_list
 
 class Animation:
-    def __init__(self, spritesheet, json):
+    def __init__(self, spritesheet, json, animation_framerate):
         self.sprites_loader = Sprite_sheet(spritesheet, json)
-        self.animation = self.sprites_loader.get_frames_arrray()
+        self.frames = self.sprites_loader.get_frames_arrray()
+        self.framerate = animation_framerate
+        self.increment = (self.framerate/60)
         self.index = 0
+        self.playing = False
+        self.loop = False
 
-    def draw_frame(self, screen):
-        screen.blit(self.animation[self.index])
+    def scale_animation(self, x, y):
+        for i in range(len(self.frames)) :
+            image =pygame.transform.scale(self.frames[i], (y,x))
+            self.frames[i] = image
 
-    def update_index(self):
-        pass
+    def set_framerate(self, framerate):
+        self.framerate = framerate
 
+    def draw_frame(self, screen, rect):
+        screen.blit(self.frames[int(self.index)], rect)
 
-test = Sprite_sheet("assets/test_animation/trainer_sheet.png", "assets/test_animation/trainer_sheet.json")
-test.get_frames_name()
+    def update_index(self, dt):
+        self.index += self.increment * (dt * 60)
+        if self.index > len(self.frames)-1 :
+            self.index = 0
+            if not self.loop :
+                self.playing = False
 
-runing = True
-window
-while runing :
+    def display_animation(self, screen, rect, dt) :
+        """
+        On appelle cette méthode dans la boucle display
+        """
+        if self.playing :
+            self.draw_frame(screen, rect)
+            self.update_index(dt)
+
 

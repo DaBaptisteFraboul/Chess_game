@@ -40,26 +40,15 @@ class ChessBoard:
         self.move_LOG = []
         self.colour_to_play = "white"
         self.overlay = []
-        self.white_king_location = [7, 4]
-        self.black_king_location = [0, 4]
-        self.checkmate = False
-        self.pat = False
         self.gameover_rect = pygame.Rect(50, 50, 256, 64)
         self.check_color = pygame.Color((32, 99, 232))
         self.pat_color = pygame.Color((120, 76, 133))
-        self.valid_squares = []
+
         # variables pour l'echec et le clouage
-        self.inCheck = False
-        self.clouage = []
-        self.checks = []
+
         self.rect.move_ip(constants.board_offset)
-        self.current_roques_autorisation = Roque_Autorisation(True, True, True, True)
-        self.Roques_autorisation_log = [Roque_Autorisation(self.current_roques_autorisation.white_grand_roque,
-                                                           self.current_roques_autorisation.white_petit_roque,
-                                                           self.current_roques_autorisation.black_petit_roque,
-                                                           self.current_roques_autorisation.black_grand_roque)]
-        self.ongoing_promotion = False
-        self.promotion_list = []
+
+
         self.stockfish = sf.Stockfish(path="stockfish_14.1_win_x64_popcnt/stockfish_14.1_win_x64_popcnt.exe")
 
     def next_color(self):
@@ -123,7 +112,28 @@ class ChessBoard:
         return colour
 
     def set_starting_position(self):
-        self.board = constants.starting_position
+        print("Reset chessboard")
+        self.white_king_location = [7, 4]
+        self.black_king_location = [0, 4]
+        self.colour_to_play = 'white'
+        self.checkmate = False
+        self.pat = None
+        self.move_LOG = []
+        self.valid_squares = []
+        # variables pour l'echec et le clouage
+        self.inCheck = False
+        self.clouage = []
+        self.checks = []
+        self.board = constants.get_starting_position()
+        self.ongoing_promotion = False
+        self.promotion_list = []
+
+        print(self.board)
+        self.current_roques_autorisation = Roque_Autorisation(True, True, True, True)
+        self.Roques_autorisation_log = [Roque_Autorisation(self.current_roques_autorisation.white_grand_roque,
+                                                           self.current_roques_autorisation.white_petit_roque,
+                                                           self.current_roques_autorisation.black_petit_roque,
+                                                           self.current_roques_autorisation.black_grand_roque)]
 
     def set_promotion_menu(self, screen, promotion_square):
         piece_square = (self.move_LOG[-1].end_row,
@@ -271,7 +281,7 @@ class ChessBoard:
         self.current_roques_autorisation.Update_roque_authorisation(move)
         self.move_LOG.append(move)
 
-    def Undo_Move(self):
+    def Undo_Move(self, player_colour):
         if self.move_LOG:
             last_move = self.move_LOG[-1]
             self.board[last_move.end_row][last_move.end_col] = last_move.captured_piece  # on change la pièce d'arrivée
@@ -323,6 +333,9 @@ class ChessBoard:
                     else :
                         self.current_roques_autorisation.black_petit_roque = True
                         self.current_roques_autorisation.black_grand_roque = True
+
+            if self.colour_to_play != player_colour :
+                self.Undo_Move(player_colour)
 
         else:
             print("no moves to undo, trait aux blancs!")
@@ -859,6 +872,9 @@ class ChessBoard:
         for move in self.move_LOG :
             capture_LOG.append(move.captured_piece)
         return capture_LOG
+    def set_FEN(self, FEN):
+        regex_pattern = r"[rwqbkpnRQBKPN0-8-]+"
+        pass
 
     def get_FEN(self):
         FEN = ""

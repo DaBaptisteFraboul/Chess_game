@@ -34,7 +34,8 @@ name = "Chess"
 FPS = 60
 # Chess related stuff
 
-starting_position = [
+def get_starting_position() :
+    return  [
     ['black_rock', 'black_knight','black_bishop', 'black_queen','black_king', 'black_bishop','black_knight', 'black_rock'],
     ['black_pawn','black_pawn','black_pawn','black_pawn','black_pawn','black_pawn','black_pawn','black_pawn',],
     ["EmptySquare", "EmptySquare", "EmptySquare", "EmptySquare", "EmptySquare", "EmptySquare", "EmptySquare", "EmptySquare" ],
@@ -45,6 +46,12 @@ starting_position = [
     ['white_rock', 'white_knight', 'white_bishop', 'white_queen', 'white_king', 'white_bishop', 'white_knight',
      'white_rock']
 ]
+
+quit = False
+
+def quit_game() :
+    quit = True
+    return quit
 
 # Constant UI-related
 

@@ -26,8 +26,8 @@ Roadmap of implementations to make :
   
     🟧 Complete redesign :
       🟧 Pieces
-      ⬜ Board
-    ⬜ GUI
+      ✅  Board
+    ✅ GUI
     ⬜ Victory screen
     ⬜ Defeat screen 
     ⬜ Menus
@@ -35,10 +35,10 @@ Roadmap of implementations to make :
     
   🎵 Sound :
   
-    ⬜ Sound system implementation
-    ⬜ Sound design for moves
-    ⬜ Victory sound
-    ⬜ Defeat sound
+    🟧 Sound system implementation
+    🟧 Sound design for moves
+    🟧 Victory sound
+    🟧 Defeat sound
     
   ⭐ Miscellaneous :
   
@@ -46,13 +46,13 @@ Roadmap of implementations to make :
       (Retake on it)
     ⬜ Algebrical notation of the game
     ⬜ Position loading
-    ⬜ Drag and drop implementation
-    ⬜ Menus integration
-    ⬜ Stockfish integration for AI
-    ⬜ Chess.com Daily puzzle
-    ⬜ Multiplayer :
-      ⬜ Sending moves using network
-      ⬜ Receiving moves throught network
+    # Drag and drop implementation
+    ✅ Menus integration
+    ✅ Stockfish integration for AI
+    # Chess.com Daily puzzle
+    # Multiplayer :
+      # Sending moves using network
+      # Receiving moves throught network
    
 Thx to Paul-Émile for teaching me so much about computers, sofware and programation.
     

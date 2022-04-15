@@ -3,6 +3,9 @@ import chess_globals_variable
 import constants
 import chess_engine
 import sys
+import time
+import animation_module
+from Gui import *
 
 """
 Une c'est une fonction avec une boucle While runnin avec sa propre variable running
@@ -40,6 +43,8 @@ class Menu:
         self.mx, self.my = pygame.mouse.get_pos()
         self.right_clicking = False
         self.app_running = True
+        # Framerate independence
+        self.previous_time = time.time()
 
 
 
@@ -68,11 +73,18 @@ class Menu:
 
     def run(self):
          # nécessaire pour réutiliser plusieures fois le menu
+        self.is_running = True
         while self.is_running :
+            self.now =time.time()
+            self.dt = self.now - self.previous_time
+            self.previous_time = self.now
             self.events()
             self.update()
             self.display()
             self.clock.tick(60)
+            if constants.quit :
+                break
+        return
 
 class MainMenu(Menu) :
     """
@@ -112,27 +124,45 @@ class MainMenu(Menu) :
 class PauseMenu(Menu):
     def __init__(self, screen, pause_bg):
         super().__init__(screen)
-        print(self.is_running)
+        self.font = pygame.font.Font("assets/Retro Gaming.ttf",24)
+        for fonts in pygame.font.get_fonts():
+            print(fonts)
+        self.Pause_title = self.font.render("Pause Title", 150,200)
         self.color = pygame.Color(125,125,135,a = 125)
         self.surface = pygame.Surface((300,500), flags=pygame.SRCALPHA)
         self.surface.fill(self.color)
         self.surface.set_alpha(200)
         self.pause_bg = pause_bg
+        self.trainer_animation = animation_module.Animation("assets/test_animation/trainer_sheet.png",
+                                                            "assets/test_animation/trainer_sheet.json",
+                                                            5)
+        self.trainer_animation.playing = True
+        self.trainer_animation.loop = True
+        self.animation_rect = pygame.Rect(100,100,500,500)
+        self.quit_button = Button(40,60,"assets/GUI/button_pressed.png", 12)
+        self.quit_button.scale_button(64,128)
+
 
     def handle_keyboard_events(self, event):
         if event.type == pygame.KEYDOWN:
+            if event.type == pygame.QUIT :
+                self.is_running = False
+                constants.quit_game()
             if event.key == pygame.K_ESCAPE:
                 self.is_running = False
+
 
 
             if event.key == pygame.K_w:
                 print("pressed during pause")
 
-            if event.key == pygame.QUIT:
 
-                self.is_running = False
-                return False
-
+    def events(self):
+        for event in pygame.event.get() :
+            if event.type == pygame.QUIT:
+                constants.quit = True
+            self.handle_keyboard_events(event)
+            self.handle_click_event(event)
 
     def update(self):
         pass
@@ -142,25 +172,30 @@ class PauseMenu(Menu):
         if event.type == pygame.MOUSEBUTTONDOWN :
             if event.button == 1 :
                 print("click at {}".format((self.mx, self.my)))
+                if self.quit_button.click_event(self.mx, self.my) :
+                    pass
+                    #self.is_running = False
+                    #constants.quit = True
 
     def display(self):
         #self.screen.blit(pygame.image.load("assets/board/export/Application_bg.png"), (0, 0))
         #self.screen.fill(pygame.Color(125,125,125,a=125),pygame.Rect(20,50,200,500))
         self.screen.blit(self.pause_bg, (0,0))
-        self.screen.blit(self.surface,(10,10))
+        #self.screen.blit(self.surface,(10,10))
+        self.quit_button.button_display(self.screen, self.dt)
+        self.trainer_animation.display_animation(self.screen, self.animation_rect, self.dt)
+        self.screen.blit(self.Pause_title, (100,300))
         pygame.display.flip()
 
-    def run(self):
-         # nécessaire pour réutiliser plusieures fois le menu
-        while self.is_running :
-            self.events()
-            self.update()
-            self.display()
-            self.clock.tick(60)
+
 
 class ChessGame(Menu) :
     def __init__(self, screen, player_color = 'white'):
         super().__init__(screen)
+        self.reset_button = Button(592,164, "assets/GUI/button_pressed.png",19)
+        self.reset_button.scale_button(32,64)
+        self.quit_boutton = Button(652,8,"assets/GUI/Quit_button.png",24)
+        self.quit_boutton.scale_button(44,40)
         self.player_color = player_color
         self.board = chess_engine.ChessBoard()
         self.board.set_starting_position()
@@ -183,6 +218,7 @@ class ChessGame(Menu) :
         self.computer_move = None
         self.pause_bg = None
         self.pause = PauseMenu(self.screen, self.pause_bg)
+        self.endgame_menu = EndgameMenu(self.screen)
 
         # variable used to avoid to recalculate moves every frames
 
@@ -200,15 +236,30 @@ class ChessGame(Menu) :
             return False
 
     def update(self):
-        pass
+        rerun = False
+        if self.board.checkmate or self.board.pat:
+            if self.board.checkmate:
+                if self.board.colour_to_play == self.player_color:
+                    rerun = self.endgame_menu.player_lost = True
 
+                self.endgame_menu.run()
+                self.board.set_starting_position()
+                print(self.board.board)
+
+                print("Chekmate" + self.board.colour_to_play + " have lost the game")
+            if self.board.pat:
+                print("Pat - Partie Nulle-")
+        if rerun :
+            self.board.set_starting_position()
+            self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
     def handle_keyboard_events(self, event):
 
         if event.type == pygame.QUIT :
             chess_globals_variable.is_running = False
+            constants.quit = True
             self.running = False
             sys.exit()
-        if event.type == pygame.KEYDOWN :
+        if event.type == pygame.KEYDOWN and self.board.colour_to_play == self.player_color:
             if event.key == pygame.K_SPACE :
                 for moves_in_LOG in self.board.move_LOG :
                     print(moves_in_LOG.get_notation())
@@ -219,8 +270,11 @@ class ChessGame(Menu) :
             if event.key == pygame.K_x :
                 chess_globals_variable.change_value()
 
+            if event.key == pygame.K_m :
+                self.board.set_starting_position()
+
             if event.key == pygame.K_a :
-                self.board.Undo_Move()
+                self.board.Undo_Move(self.player_color)
                 if self.god_mod :
                     self.board.next_color()
                 self.Valid_moves= self.board.get_Valid_moves(self.board.colour_to_play)
@@ -233,6 +287,9 @@ class ChessGame(Menu) :
                     self.god_mod = False
                 else :
                     self.god_mod = True
+            if event.key == pygame.K_z :
+                fen = self.board.get_FEN()
+                print(fen)
 
             if event.key == pygame.K_f :
                 print("f is pressed")
@@ -263,7 +320,13 @@ class ChessGame(Menu) :
         if event.type == pygame.MOUSEBUTTONDOWN:
             # clic droit détecté
             # on vérifie que le click est bien sur le board de l'échiquier
-            if self.is_inside_board(self.mx, self.my):
+            if self.reset_button.click_event(self.mx, self.my) :
+                print("reset button")
+                self.board.set_starting_position()
+                self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
+            if self.quit_boutton.click_event(self.mx, self.my) :
+                print("Click Quit")
+            if self.is_inside_board(self.mx, self.my) and self.board.colour_to_play == self.player_color:
                 if event.button == 1:
                     location = ((self.my - 128) // 64,
                                 (
@@ -310,8 +373,7 @@ class ChessGame(Menu) :
                         self.board.next_color()
                     self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
                     self.move_made = False
-            else:
-                print("Outside gameboard")
+
 
     def display(self):
         """
@@ -326,13 +388,10 @@ class ChessGame(Menu) :
         self.screen.blit(self.screen_ui, (64,640))
         self.board.draw_board(self.screen)
         self.board.draw_pieces(self.screen)
+        self.reset_button.button_display(self.screen, self.dt)
+        self.quit_boutton.button_display(self.screen, self.dt)
         if self.player_clicks != []:
             self.board.draw_moves(self.screen, self.Valid_moves, self.player_clicks[0])
-        if self.board.checkmate or self.board.pat:
-            if self.board.checkmate:
-                print("Chekmate" + self.board.colour_to_play + " have lost the game")
-            if self.board.pat:
-                print("Pat - Partie Nulle-")
             # On mettra ici le déclencheement de l'animation de victoire et du menu rejouer.
         pygame.display.flip()
 
@@ -374,7 +433,37 @@ class PauseOptionsMenu(Menu):
 class EndgameMenu(Menu):
     def __init__(self, screen):
         super().__init__(screen)
+        self.player_lost = None
 
+    def handle_keyboard_events(self, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                self.is_running = False
+                return True
+
+    def handle_click_event(self, event):
+        pass
+
+    def update(self):
+        pass
+
+
+    def display(self):
+        if self.player_lost :
+            self.screen.fill((178,20,20))
+        else :
+            self.screen.fill((20,20,178))
+        pygame.display.flip()
+
+    def run(self):
+        self.is_running = True
+        while self.is_running :
+            self.events()
+            self.update()
+            self.display()
+            self.clock.tick(60)
+            if constants.quit :
+                break
 class CreditsMenu(Menu):
     def __init__(self, screen):
         super().__init__(screen)
