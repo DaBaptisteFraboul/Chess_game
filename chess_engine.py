@@ -15,10 +15,13 @@ class ChessBoard:
         - the stockfish ai to play with the computer
 
     """
-    def __init__(self):
+    def __init__(self, player_colour= 'black'):
+        self.side = player_colour
         self.image = pygame.image.load("assets/board/export/chessboard_tex.png")
         self.image = pygame.transform.scale(self.image, (512,512))
+
         self.rect = self.image.get_rect()
+
         self.board = [
             ["EmptySquare", "EmptySquare", "EmptySquare", "EmptySquare", "EmptySquare", "EmptySquare", "EmptySquare",
              "EmptySquare"],
@@ -82,18 +85,69 @@ class ChessBoard:
         for move in moves:  # pour les moves dans les moves valids
             if move.start_row == square[0] and move.start_col == square[1] and \
                     [move.start_row, move.start_col] != [move.end_row, move.end_col]:
-                screen.blit(constants.image_overlay, pygame.Rect(move.end_col * 64 + constants.board_offset[0],
+                if self.side == 'white' :
+                    screen.blit(constants.image_overlay, pygame.Rect(move.end_col * 64 + constants.board_offset[0],
                                                                  move.end_row * 64 + constants.board_offset[1], 64, 64))
+                if self.side =='black' :
+                    screen.blit(constants.image_overlay, pygame.Rect(constants.turn_board[move.end_col] * 64 + constants.board_offset[0],
+                                                                     constants.turn_board[move.end_row] * 64 + constants.board_offset[1], 64,
+                                                                     64))
+
+    def draw_single_piece(self, screen, row, col):
+        if self.side == "white":
+            rect = pygame.Rect(row * 64 + constants.board_offset[0],
+                               col * 64 + constants.board_offset[1],
+                               64,
+                               64)
+            piece = self.board[col][row]
+            screen.blit(constants.Images[piece], rect)
+        elif self.side == 'black':
+            rect = pygame.Rect(constants.turn_board[row] * 64 + constants.board_offset[0],
+                               constants.turn_board[col] * 64 + constants.board_offset[1],
+                               64,
+                               64)
+            piece = self.board[col][row]
+            screen.blit(constants.Images[piece], rect)
+
+    def draw_outline(self, row, col, screen):
+        if self.side == "white" :
+            loc = ( row * 64 + constants.board_offset[1],
+                    col * 64 + constants.board_offset[0],)
+        elif self.side == 'black' :
+            loc = ( constants.turn_board[row] * 64 + constants.board_offset[1],
+                    constants.turn_board[col] * 64 + constants.board_offset[0])
+        piece = self.board[row][col]
+        if piece != 'EmptySquare' :
+            piece_image = constants.Images[piece]
+            mask = pygame.mask.from_surface(piece_image)
+            mask_surface = mask.to_surface()
+            mask_surface.fill((255,0,0), special_flags=3)
+            mask_surface.set_colorkey((0,0,0))
+            screen.blit(mask_surface, (loc[1] - 4,loc[0]))
+            screen.blit(mask_surface, (loc[1] +4, loc[0]))
+            screen.blit(mask_surface, (loc[1], loc[0] +4))
+            screen.blit(mask_surface, (loc[1], loc[0]-4))
+        else :
+            pass
 
     def draw_pieces(self, screen):
         for row in range(8):
             for col in range(8):
-                rect = pygame.Rect(row * 64 + constants.board_offset[0],
-                                   col * 64 + constants.board_offset[1],
-                                   64,
-                                   64)
-                piece = self.board[col][row]
-                screen.blit(constants.Images[piece], rect)
+                if self.side == "white" :
+                    rect = pygame.Rect(row * 64 + constants.board_offset[0],
+                                       col * 64 + constants.board_offset[1],
+                                       64,
+                                       64)
+                    piece = self.board[col][row]
+                    screen.blit(constants.Images[piece], rect)
+                elif self.side == 'black' :
+                    rect = pygame.Rect(constants.turn_board[row] * 64 + constants.board_offset[0],
+                                       constants.turn_board[col] * 64 + constants.board_offset[1],
+                                       64,
+                                       64)
+                    piece = self.board[col][row]
+                    screen.blit(constants.Images[piece], rect)
+
 
     def get_piece_type(self, piece_square):
         '''
@@ -111,8 +165,7 @@ class ChessBoard:
         colour = piece[0:5]
         return colour
 
-    def set_starting_position(self):
-        print("Reset chessboard")
+    def set_starting_position(self, player_colour = 'white'):
         self.white_king_location = [7, 4]
         self.black_king_location = [0, 4]
         self.colour_to_play = 'white'
@@ -124,11 +177,9 @@ class ChessBoard:
         self.inCheck = False
         self.clouage = []
         self.checks = []
-        self.board = constants.get_starting_position()
+        self.board = constants.get_starting_position(player_colour)
         self.ongoing_promotion = False
         self.promotion_list = []
-
-        print(self.board)
         self.current_roques_autorisation = Roque_Autorisation(True, True, True, True)
         self.Roques_autorisation_log = [Roque_Autorisation(self.current_roques_autorisation.white_grand_roque,
                                                            self.current_roques_autorisation.white_petit_roque,
@@ -243,11 +294,11 @@ class ChessBoard:
         if move.is_en_passant :
             if self.colour_to_play == 'white' :
                 print('white_passing')
-                print(move.end_row + 1, move.end_col)
-                self.board[move.end_row + 1][move.end_col] = 'EmptySquare'
+                print(move.end_row + constants.get_forward_direction(self.colour_to_play), move.end_col)
+                self.board[move.end_row + constants.get_forward_direction(self.colour_to_play)][move.end_col] = 'EmptySquare'
                 move.captured_piece = 'black_pawn'
             if move.moved_piece == 'black_pawn' :
-                self.board[move.end_row - 1][move.end_col] = 'EmptySquare'
+                self.board[move.end_row - constants.get_forward_direction(self.colour_to_play)][move.end_col] = 'EmptySquare'
                 move.captured_piece = 'white_pawn'
             print(move.captured_piece)
         """
@@ -366,7 +417,6 @@ class ChessBoard:
 
                     elif type == 'king':
                         self.get_King_moves(rows, c, moves, colour)
-                        #print(self.current_roques_autorisation.print_roques_availables())
                         self.get_Roque_Moves(rows, c, moves, colour)
                 else:
                     pass
@@ -402,6 +452,7 @@ class ChessBoard:
                         self.get_Queen_moves(rows, c, moves, colour)
                     elif type == 'king':
                         self.get_King_moves(rows, c, moves, colour)
+
                     else:
                         pass
 
@@ -577,14 +628,12 @@ class ChessBoard:
         if self.inCheck:
             return
         if colour == 'white':
-            king_loc = self.white_king_location
             if self.current_roques_autorisation.white_grand_roque:
                 if self.board[r][c - 1] == 'EmptySquare' and self.board[r][c - 2] == 'EmptySquare':
                     if not (self.square_under_attack(r, c - 2, self.colour_to_play) or
                             self.square_under_attack(r, c -1 , self.colour_to_play)):
                         grand_roque = Move([r, c], [r, c - 2], self.board, is_roque= True)
                         moves.append(grand_roque)
-
             if self.current_roques_autorisation.white_petit_roque:
                 if self.board[r][c + 1] == 'EmptySquare' and self.board[r][c + 2] == 'EmptySquare':
                     if  (not self.square_under_attack(r,c + 2, self.colour_to_play) and
@@ -594,20 +643,20 @@ class ChessBoard:
             else :
                 pass
         elif colour == 'black':
-            king_loc = self.black_king_location
             if self.current_roques_autorisation.black_grand_roque:
-                if self.board[r][c - 1] == 'EmptySquare' and self.board[r][c - 2] == 'EmptySquare':
+                if self.board[r][c -1] == 'EmptySquare' and self.board[r][c - 2] == 'EmptySquare':
                     if  (not self.square_under_attack(r, c - 2, self.colour_to_play) or
                             not self.square_under_attack(r, c - 1, self.colour_to_play)) :
                         grand_roque = Move([r, c], [r, c - 2], self.board, is_roque=True)
                         moves.append(grand_roque)
 
             if self.current_roques_autorisation.black_petit_roque:
-                if not (self.square_under_attack(r, c + 2, self.colour_to_play) or
-                        self.square_under_attack(r, c + 1, self.colour_to_play)):
-
-                    petit_roque = Move([r, c], [r, c + 2], self.board, is_roque=True)
-                    moves.append(petit_roque)
+                if self.board[r][c + 1] == 'EmptySquare' and self.board[r][c + 2] == 'EmptySquare':
+                    if not (self.square_under_attack(r, c + 2, self.colour_to_play) or
+                            self.square_under_attack(r, c + 1, self.colour_to_play)):
+                        petit_roque = Move([r, c], [r, c + 2], self.board, is_roque=True)
+                        print("move added")
+                        moves.append(petit_roque)
             else :
                 pass
         else:
@@ -642,14 +691,15 @@ class ChessBoard:
             if 0 <= r <= 7 and 0 <= c <= 7:
                 if len(self.move_LOG) != 0:
                     if self.move_LOG[-1].is_pawn_charge :
-                        if (self.move_LOG[-1].end_col == c + 1 or self.move_LOG[-1].end_col == c - 1) and \
-                        r == 3 :
+                        if (self.move_LOG[-1].end_col == c + 1 or
+                            self.move_LOG[-1].end_col == c - 1) and \
+                            r == 3 :
                             moves.append(
                                 Move([r, c], [self.move_LOG[-1].end_row - 1, self.move_LOG[-1].end_col], self.board, False, False,
                                      True))
                 if self.board[r - 1][c] == 'EmptySquare' :
                     if not piece_clouee or pin_direction == (0, -1):
-                        moves.append(Move([r, c], [r - 1, c], self.board))  # on avance d'une case s'il n'y a pas de pièce
+                        moves.append(Move([r, c], [r - 1 , c], self.board))  # on avance d'une case s'il n'y a pas de pièce
                 if r == 6 and self.board[r - 2][c] == 'EmptySquare' and self.board[r - 1][c] == 'EmptySquare':
                     if not piece_clouee or pin_direction == (0, -1):
                         moves.append(Move([r, c], [r - 2, c], self.board,False, True))
@@ -675,19 +725,18 @@ class ChessBoard:
                                      False,
                                      True ))
                     if r != 7 :
-                        if self.board[r + 1][c] == 'EmptySquare' :
+                        if self.board[r + 1 ][c] == 'EmptySquare' :
                             if not piece_clouee or pin_direction == (1, 0):
-                                moves.append(Move([r, c], [r + 1, c], self.board))
+                                moves.append(Move([r, c], [r + 1 , c], self.board))
                         if r == 1 and (self.board[r + 2][c] == 'EmptySquare' and self.board[r+1][c] == 'EmptySquare'):
                             if not piece_clouee or pin_direction == (1, 0):
-                                charge = Move([r, c], [r + 2, c], self.board, False,True)
                                 moves.append(Move([r, c], [r + 2, c], self.board, False,True))
                         if c + 1 <= 7:
-                            if self.get_piece_colour([r + 1, c + 1]) == 'white':
+                            if self.get_piece_colour([r + 1 , c + 1]) == 'white':
                                 if not piece_clouee or pin_direction == (1, 1):
-                                    moves.append(Move([r, c], [r + 1, c + 1], self.board))
+                                    moves.append(Move([r, c], [r + 1 , c + 1], self.board))
                         if c - 1 >= 0:
-                            if self.get_piece_colour([r + 1, c - 1]) == 'white':
+                            if self.get_piece_colour([r + 1 , c - 1]) == 'white':
                                 if not piece_clouee or pin_direction == (1, -1):
                                     moves.append(Move([r, c], [r + 1, c - 1], self.board))
 
@@ -957,6 +1006,7 @@ class ChessBoard:
         FEN += ' ' + str(move_from_last_capture)
 
         FEN += ' ' + str(math.trunc(len(self.move_LOG) / 2))
+
 
         return FEN
 

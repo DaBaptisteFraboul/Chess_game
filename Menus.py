@@ -23,6 +23,9 @@ L'idée est de stocker chaque menu dans une variable au lancement du programme e
 la méthode run()
 """
 
+# Fonts
+
+
 class Menu:
     '''
     Cette classe définie le principe des menus et les éléments récurents que l'on va retrouver dedans
@@ -125,8 +128,6 @@ class PauseMenu(Menu):
     def __init__(self, screen, pause_bg):
         super().__init__(screen)
         self.font = pygame.font.Font("assets/Retro Gaming.ttf",24)
-        for fonts in pygame.font.get_fonts():
-            print(fonts)
         self.Pause_title = self.font.render("Pause Title", 150,200)
         self.color = pygame.Color(125,125,135,a = 125)
         self.surface = pygame.Surface((300,500), flags=pygame.SRCALPHA)
@@ -136,6 +137,9 @@ class PauseMenu(Menu):
         self.trainer_animation = animation_module.Animation("assets/test_animation/trainer_sheet.png",
                                                             "assets/test_animation/trainer_sheet.json",
                                                             5)
+        self.image = pygame.image.load('assets/board/export/pieces/03/white_king.png')
+        self.mask = self.image.get_masks()
+
         self.trainer_animation.playing = True
         self.trainer_animation.loop = True
         self.animation_rect = pygame.Rect(100,100,500,500)
@@ -174,14 +178,10 @@ class PauseMenu(Menu):
                 print("click at {}".format((self.mx, self.my)))
                 if self.quit_button.click_event(self.mx, self.my) :
                     pass
-                    #self.is_running = False
-                    #constants.quit = True
 
     def display(self):
-        #self.screen.blit(pygame.image.load("assets/board/export/Application_bg.png"), (0, 0))
-        #self.screen.fill(pygame.Color(125,125,125,a=125),pygame.Rect(20,50,200,500))
+
         self.screen.blit(self.pause_bg, (0,0))
-        #self.screen.blit(self.surface,(10,10))
         self.quit_button.button_display(self.screen, self.dt)
         self.trainer_animation.display_animation(self.screen, self.animation_rect, self.dt)
         self.screen.blit(self.Pause_title, (100,300))
@@ -190,7 +190,7 @@ class PauseMenu(Menu):
 
 
 class ChessGame(Menu) :
-    def __init__(self, screen, player_color = 'white'):
+    def __init__(self, screen, player_color ):
         super().__init__(screen)
         self.reset_button = Button(592,164, "assets/GUI/button_pressed.png",19)
         self.reset_button.scale_button(32,64)
@@ -280,7 +280,14 @@ class ChessGame(Menu) :
                 self.Valid_moves= self.board.get_Valid_moves(self.board.colour_to_play)
 
             if event.key == pygame.K_b :
-                self.board.get_Valid_moves(self.board.colour_to_play)
+                self.board.side = 'white'
+
+            if event.key == pygame.K_n :
+                self.board.side = 'black'
+
+            if event.key == pygame.K_s :
+                fen = self.board.get_FEN()
+                print(self.board.stockfish.get_board_visual())
 
             if event.key == pygame.K_w :
                 if self.god_mod :
@@ -324,6 +331,7 @@ class ChessGame(Menu) :
                 print("reset button")
                 self.board.set_starting_position()
                 self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
+                self.selected_case = ()
             if self.quit_boutton.click_event(self.mx, self.my) :
                 print("Click Quit")
             if self.is_inside_board(self.mx, self.my) and self.board.colour_to_play == self.player_color:
@@ -331,8 +339,12 @@ class ChessGame(Menu) :
                     location = ((self.my - 128) // 64,
                                 (
                                             self.mx - 64) // 64)  # on récupère la position du clic sur le board (attention il faut inverser c et r)
-                    row = location[0]
-                    col = location[1]
+                    if self.board.side == 'white':
+                        row = location[0]
+                        col = location[1]
+                    if self.board.side == 'black':
+                        row = constants.turn_board[location[0]]
+                        col = constants.turn_board[location[1]]
                     # player selected the same case // cancel command
                     if self.selected_case == (row, col):
                         self.selected_case = ()  # deselec
@@ -387,12 +399,21 @@ class ChessGame(Menu) :
         self.screen.blit(self.screen_ui, (64,0))
         self.screen.blit(self.screen_ui, (64,640))
         self.board.draw_board(self.screen)
+
+
+
         self.board.draw_pieces(self.screen)
         self.reset_button.button_display(self.screen, self.dt)
         self.quit_boutton.button_display(self.screen, self.dt)
         if self.player_clicks != []:
             self.board.draw_moves(self.screen, self.Valid_moves, self.player_clicks[0])
             # On mettra ici le déclencheement de l'animation de victoire et du menu rejouer.
+        if self.selected_case:
+            if self.board.board[self.selected_case[0]][self.selected_case[1]] != 'EmptySquare':
+
+                self.board.draw_outline(self.selected_case[0], self.selected_case[1], self.screen)
+                self.board.draw_single_piece(self.screen, self.selected_case[1], self.selected_case[0])
+
         pygame.display.flip()
 
     def events(self):
@@ -400,6 +421,7 @@ class ChessGame(Menu) :
             print("computer is playing")
             fen = self.board.get_FEN()
             self.computer_move = self.board.do_best_move(fen)
+            print(self.board.stockfish.get_board_visual())
 
         for events in pygame.event.get():
             self.handle_keyboard_events(events)
@@ -450,9 +472,9 @@ class EndgameMenu(Menu):
 
     def display(self):
         if self.player_lost :
-            self.screen.fill((178,20,20))
+            self.screen.fill((178,20,20,120))
         else :
-            self.screen.fill((20,20,178))
+            self.screen.fill((20,20,178,120))
         pygame.display.flip()
 
     def run(self):
