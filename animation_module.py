@@ -65,7 +65,7 @@ class Animation:
 
     def scale_animation(self, x, y):
         for i in range(len(self.frames)) :
-            image =pygame.transform.scale(self.frames[i], (y,x))
+            image = pygame.transform.scale(self.frames[i], (y,x))
             self.frames[i] = image
 
     def set_framerate(self, framerate):
@@ -74,19 +74,32 @@ class Animation:
     def draw_frame(self, screen, rect):
         screen.blit(self.frames[int(self.index)], rect)
 
-    def update_index(self, dt):
+    def update_index_forward(self, dt):
         self.index += self.increment * (dt * 60)
-        if self.index > len(self.frames)-1 :
+        if self.index > len(self.frames) - 1 :
             self.index = 0
             if not self.loop :
                 self.playing = False
 
-    def display_animation(self, screen, rect, dt) :
+    def update_index_backwardd(self, dt):
+        self.index -= self.increment * (dt * 60)
+        if self.index < 0:
+            self.index = len(self.frames) - 1
+            if not self.loop:
+                self.playing = False
+
+    def display_animation(self, screen, rect, dt, forward = True) :
         """
         On appelle cette méthode dans la boucle display
         """
         if self.playing :
-            self.draw_frame(screen, rect)
-            self.update_index(dt)
+            if forward :
+                self.draw_frame(screen, rect)
+                self.update_index_forward(dt)
+
+            if not forward :
+                self.draw_frame(screen, rect)
+                self.update_index_backwardd(dt)
+
 
 

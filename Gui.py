@@ -10,20 +10,21 @@ class Button:
         et ses animations
         '''
         data = spritesheet.replace("png","json")
-        self.pressed = False
+        self.clicked = False
         self.animation = animation_module.Animation(spritesheet, data, framerate)
         self.image = self.animation.frames[0]
         self.rect = self.image.get_rect()
         self.set_position(pos_x,pos_y)
+        self.animation.index = len(self.animation.frames) - 1
 
     def set_position(self, x,y):
         self.rect.x, self.rect.y = x, y
 
     def button_display(self, screen, dt):
-        if self.pressed:
+        if self.clicked:
             self.animation.playing = True
-            self.animation.display_animation(screen, self.rect, dt)
-            self.pressed = self.animation.playing
+            self.animation.display_animation(screen, self.rect, dt,False)
+            self.clicked = self.animation.playing
         else:
             screen.blit(self.image,self.rect)
 
@@ -33,38 +34,69 @@ class Button:
         self.image = self.animation.frames[0]
         self.rect = self.image.get_rect(x=pos_x, y=pos_y)
 
-    def clicked(self):
-        "Méthode à appeler lorsque le bouton est pressé"
-        print("Pressed button")
 
     def click_event(self, mx, my):
         if self.rect.collidepoint(mx, my):
-            if not self.pressed :
-                self.pressed = True
-        return self.pressed
+            if not self.clicked :
+                self.clicked = True
+
+        return self.clicked
 
 
+class SwitchButton(Button):
+    def __init__(self,pos_x, pos_y,  spritesheet, framerate, pressed):
+        """
 
+        :param pos_x:
+        :param pos_y:
+        :param spritesheet:
+        :param framerate:
+        :param pressed: Boolean
+        """
+        super().__init__(pos_x, pos_y,  spritesheet, framerate)
+        self.pressed = pressed
+        print(self.pressed)
+        if self.pressed:
+            self.animation.index = len(self.animation.frames) - 1
+            self.image = self.animation.frames[0]
+        if not self.pressed:
+            self.animation.index = 0
+            self.image = self.animation.frames[len(self.animation.frames) - 1]
 
+    def click_event(self, mx, my):
+        if self.rect.collidepoint(mx, my):
+            if not self.clicked:
+                self.clicked = True
+                if self.pressed :
+                    self.animation.index = len(self.animation.frames) - 1
+                    self.image = self.animation.frames[0]
+                if not self.pressed:
+                    self.animation.index = 0
+                    self.image = self.animation.frames[len(self.animation.frames) - 1]
 
-"""win = pygame.display.set_mode((200,200))
-button = Button(10,10,"assets/GUI/button_pressed.png",12)
-button.scale_button(64,128)
-button.set_position(12,50)
-running = True
-previous_time = time.time()
-while running :
-    now = time.time()
-    dt = now - previous_time
-    previous_time = now
-    mx, my = pygame.mouse.get_pos()
-    for event in pygame.event.get() :
-        if event.type == pygame.QUIT :
-            running = False
-        if event.type == pygame.MOUSEBUTTONDOWN :
-            button.click_event(mx, my)
-    win.fill("black")
-    button.button_display(win, dt)
+                return self.clicked
 
-    pygame.display.flip()
-"""
+    def button_display(self, screen, dt):
+
+        if self.clicked:
+            if self.pressed :
+                self.animation.playing = True
+                self.animation.display_animation(screen, self.rect, dt, False)
+                if not self.animation.playing :
+                    self.clicked = False
+                    self.pressed = False
+                    return
+
+            if not self.pressed:
+                self.animation.playing = True
+                self.animation.display_animation(screen, self.rect, dt, True)
+                if not self.animation.playing:
+                    self.clicked = False
+                    self.pressed = True
+                    return
+
+        if not self.clicked:
+            if self.pressed :
+               screen.blit(self.animation.frames[-1], self.rect)
+            else :
+                screen.blit(self.animation.frames[0], self.rect)

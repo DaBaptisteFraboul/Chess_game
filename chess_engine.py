@@ -53,6 +53,7 @@ class ChessBoard:
 
 
         self.stockfish = sf.Stockfish(path="stockfish_14.1_win_x64_popcnt/stockfish_14.1_win_x64_popcnt.exe")
+        self.stockfish.set_skill_level(1)
 
     def next_color(self):
         if self.colour_to_play == "white":
@@ -536,7 +537,7 @@ class ChessBoard:
                 self.pat = True
 
 
-        return legal_moves
+        return legal_moves  
 
     # cet algorithme plus élégant ne recalcule plus tous le coups de l'adversaire pour voir si le roi est en echecs en traquant sa position
     # mais il part de la position du roi pour savoir si une pièce ennemi peut l'attaquer
@@ -561,11 +562,8 @@ class ChessBoard:
                            8):  # pour chaque case on ajoute l'offset multiplié par l'itération => case finale du move
                 check_row = king_loc[0] + i * d[0]
                 check_col = king_loc[1] + i * d[1]
-                #inside Board
                 if 0 <= check_col <= 7 and 0 <= check_row <= 7:
-                    #check_piece
                     check_piece = self.board[check_row][check_col]
-                    # if
                     if self.get_piece_colour([check_row, check_col]) == colour and \
                             self.get_piece_type([check_row, check_col]) != 'king':  # pièce alliée clouage possible
                         if possible_pin == ():

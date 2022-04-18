@@ -1,4 +1,6 @@
 import pygame
+
+import Gui
 import chess_globals_variable
 import constants
 import chess_engine
@@ -192,13 +194,15 @@ class PauseMenu(Menu):
 class ChessGame(Menu) :
     def __init__(self, screen, player_color ):
         super().__init__(screen)
-        self.reset_button = Button(592,164, "assets/GUI/button_pressed.png",19)
+        self.reset_button = Button(592,164, "assets/GUI/button_pressed.png",17)
         self.reset_button.scale_button(32,64)
-        self.quit_boutton = Button(652,8,"assets/GUI/Quit_button.png",24)
+        self.quit_boutton = Button(652,8,"assets/GUI/Quit_button.png",17)
         self.quit_boutton.scale_button(44,40)
         self.player_color = player_color
         self.board = chess_engine.ChessBoard()
         self.board.set_starting_position()
+        self.color_switch = Gui.SwitchButton(588,72, "assets/GUI/Black_switch.png",24,True)
+        self.color_switch.scale_button(44,104)
         self.left_ui = pygame.image.load('assets/board/export/Left_UI.png')
         self.left_ui = pygame.transform.scale(self.left_ui, (64,768))
         self.right_ui = pygame.image.load('assets/board/export/Right_Ui.png')
@@ -217,6 +221,7 @@ class ChessGame(Menu) :
         self.selected_case = ()
         self.computer_move = None
         self.pause_bg = None
+
         self.pause = PauseMenu(self.screen, self.pause_bg)
         self.endgame_menu = EndgameMenu(self.screen)
 
@@ -329,11 +334,24 @@ class ChessGame(Menu) :
             # on vérifie que le click est bien sur le board de l'échiquier
             if self.reset_button.click_event(self.mx, self.my) :
                 print("reset button")
+                if self.color_switch.pressed :
+                    self.player_color = 'black'
+                else :
+                    self.player_color = 'white'
                 self.board.set_starting_position()
                 self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
                 self.selected_case = ()
             if self.quit_boutton.click_event(self.mx, self.my) :
                 print("Click Quit")
+
+            if self.color_switch.click_event(self.mx, self.my):
+                if self.board.side == 'white':
+                    self.board.side = 'black'
+                    return
+                else :
+                    self.board.side = 'white'
+
+
             if self.is_inside_board(self.mx, self.my) and self.board.colour_to_play == self.player_color:
                 if event.button == 1:
                     location = ((self.my - 128) // 64,
@@ -401,7 +419,7 @@ class ChessGame(Menu) :
         self.board.draw_board(self.screen)
 
 
-
+        self.color_switch.button_display(self.screen, self.dt)
         self.board.draw_pieces(self.screen)
         self.reset_button.button_display(self.screen, self.dt)
         self.quit_boutton.button_display(self.screen, self.dt)
