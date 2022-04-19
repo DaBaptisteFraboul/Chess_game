@@ -15,7 +15,7 @@ class ChessBoard:
         - the stockfish ai to play with the computer
 
     """
-    def __init__(self, player_colour= 'black'):
+    def __init__(self, player_colour= 'white'):
         self.side = player_colour
         self.image = pygame.image.load("assets/board/export/chessboard_tex.png")
         self.image = pygame.transform.scale(self.image, (512,512))
@@ -87,12 +87,19 @@ class ChessBoard:
             if move.start_row == square[0] and move.start_col == square[1] and \
                     [move.start_row, move.start_col] != [move.end_row, move.end_col]:
                 if self.side == 'white' :
-                    screen.blit(constants.image_overlay, pygame.Rect(move.end_col * 64 + constants.board_offset[0],
+                    if move.captured_piece != 'EmptySquare' :
+                        screen.blit(constants.image_attack, pygame.Rect(move.end_col * 64 + constants.board_offset[0],
                                                                  move.end_row * 64 + constants.board_offset[1], 64, 64))
+                    else :
+                        screen.blit(constants.image_overlay, pygame.Rect(move.end_col * 64 + constants.board_offset[0],
+                                                                     move.end_row * 64 + constants.board_offset[1], 64, 64))
                 if self.side =='black' :
-                    screen.blit(constants.image_overlay, pygame.Rect(constants.turn_board[move.end_col] * 64 + constants.board_offset[0],
-                                                                     constants.turn_board[move.end_row] * 64 + constants.board_offset[1], 64,
-                                                                     64))
+                    if move.captured_piece != 'EmptySquare' :
+                        screen.blit(constants.image_attack, pygame.Rect(constants.turn_board[move.end_col] * 64 + constants.board_offset[0],
+                                                constants.turn_board[move.end_row] * 64 + constants.board_offset[1], 64, 64))
+                    else :
+                        screen.blit(constants.image_overlay, pygame.Rect(constants.turn_board[move.end_col] * 64 + constants.board_offset[0],
+                                                                         constants.turn_board[move.end_row] * 64 + constants.board_offset[1], 64, 64))
 
     def draw_single_piece(self, screen, row, col):
         if self.side == "white":
@@ -283,30 +290,26 @@ class ChessBoard:
                 self.ongoing_promotion = True
 
             if move.moved_piece == 'black_pawn' and move.end_row == 7 :
-                print("promotion")
                 move.is_promotion = True
                 self.ongoing_promotion = True
-
-
 
         """
         Handle En passant
         """
         if move.is_en_passant :
             if self.colour_to_play == 'white' :
-                print('white_passing')
-                print(move.end_row + constants.get_forward_direction(self.colour_to_play), move.end_col)
-                self.board[move.end_row + constants.get_forward_direction(self.colour_to_play)][move.end_col] = 'EmptySquare'
+                self.board[move.end_row +1][move.end_col] = 'EmptySquare'
                 move.captured_piece = 'black_pawn'
             if move.moved_piece == 'black_pawn' :
-                self.board[move.end_row - constants.get_forward_direction(self.colour_to_play)][move.end_col] = 'EmptySquare'
+                self.board[move.end_row - 1][move.end_col] = 'EmptySquare'
                 move.captured_piece = 'white_pawn'
-            print(move.captured_piece)
+
         """
         Handle Roque move
         """
+
         if move.is_roque :
-            print("roque_move")
+
             tower_row = None
             tower_col = None
             tower_colour = None
@@ -319,17 +322,14 @@ class ChessBoard:
                 tower_colour = 'black'
             # On détermine la tour à bouger / le type de roque
             if move.end_col == 2 :
-                print('grand roque')
                 tower_col = 0
                 self.board[move.start_row][move.end_col + 1] = tower_colour + '_rock'
                 self.board[tower_row][tower_col] = 'EmptySquare'
             if move.end_col == 6 :
-                print('petit roque')
                 tower_col = 7
                 self.board[move.start_row][move.end_col- 1] = tower_colour + '_rock'
                 self.board[tower_row][tower_col] = 'EmptySquare'
 
-        # Mettre à jour les droits de Roques
         self.current_roques_autorisation.Update_roque_authorisation(move)
         self.move_LOG.append(move)
 
@@ -350,6 +350,7 @@ class ChessBoard:
                 if last_move.moved_piece == 'black_pawn' :
                     self.board[last_move.end_row - 1][last_move.end_col] = last_move.captured_piece
                 self.board[last_move.end_row][last_move.end_col] = 'EmptySquare'
+
             if last_move.is_roque:
                 #just like Make move but reversed
                 tower_row = None
@@ -359,7 +360,6 @@ class ChessBoard:
                 if last_move.moved_piece == 'white_king':
                     tower_row = 7
                     tower_colour = 'white'
-
                 else:
                     tower_row = 0
                     tower_colour = 'black'
@@ -453,7 +453,6 @@ class ChessBoard:
                         self.get_Queen_moves(rows, c, moves, colour)
                     elif type == 'king':
                         self.get_King_moves(rows, c, moves, colour)
-
                     else:
                         pass
 
@@ -632,12 +631,13 @@ class ChessBoard:
                             self.square_under_attack(r, c -1 , self.colour_to_play)):
                         grand_roque = Move([r, c], [r, c - 2], self.board, is_roque= True)
                         moves.append(grand_roque)
+                        print("move added")
             if self.current_roques_autorisation.white_petit_roque:
                 if self.board[r][c + 1] == 'EmptySquare' and self.board[r][c + 2] == 'EmptySquare':
                     if  (not self.square_under_attack(r,c + 2, self.colour_to_play) and
                            not self.square_under_attack(r,c + 1,self.colour_to_play)):
                         petit_roque = Move([r, c], [r, c + 2], self.board, is_roque= True)
-                        moves.append(petit_roque)
+
             else :
                 pass
         elif colour == 'black':
@@ -653,7 +653,6 @@ class ChessBoard:
                     if not (self.square_under_attack(r, c + 2, self.colour_to_play) or
                             self.square_under_attack(r, c + 1, self.colour_to_play)):
                         petit_roque = Move([r, c], [r, c + 2], self.board, is_roque=True)
-                        print("move added")
                         moves.append(petit_roque)
             else :
                 pass
@@ -673,11 +672,11 @@ class ChessBoard:
         # obtenir les coups possible du pion à la position r, c et les ajouter à moves
         piece_clouee = False
         pin_direction = ()
-        for i in range(len(self.clouage) - 1, -1, -1):
-            if self.clouage[i][0] == r and self.clouage[i][1] == c:
+        for i in range(len(self.clouage) - 1, -1, -1): # On parcours la liste des pièces clouées
+            if self.clouage[i][0] == r and self.clouage[i][1] == c: # Le clouage correspond au pion seleectioné
                 piece_clouee = True
-                pin_direction = (self.clouage[i][2], self.clouage[i][3])
-                self.clouage.remove(self.clouage[i])
+                pin_direction = (self.clouage[i][2], self.clouage[i][3])   # On note la direction du clouage
+                self.clouage.remove(self.clouage[i]) # On retire le clouage de la liste car nous allons l'ananylser
                 break
         '''
         Gestion du en passant
@@ -696,7 +695,7 @@ class ChessBoard:
                                 Move([r, c], [self.move_LOG[-1].end_row - 1, self.move_LOG[-1].end_col], self.board, False, False,
                                      True))
                 if self.board[r - 1][c] == 'EmptySquare' :
-                    if not piece_clouee or pin_direction == (0, -1):
+                    if not piece_clouee or pin_direction == (1, 0) or pin_direction == (-1,0) :
                         moves.append(Move([r, c], [r - 1 , c], self.board))  # on avance d'une case s'il n'y a pas de pièce
                 if r == 6 and self.board[r - 2][c] == 'EmptySquare' and self.board[r - 1][c] == 'EmptySquare':
                     if not piece_clouee or pin_direction == (0, -1):
@@ -919,6 +918,7 @@ class ChessBoard:
         for move in self.move_LOG :
             capture_LOG.append(move.captured_piece)
         return capture_LOG
+
     def set_FEN(self, FEN):
         regex_pattern = r"[rwqbkpnRQBKPN0-8-]+"
         pass
@@ -1113,6 +1113,7 @@ class Move:
                 self.is_pawn_charge = other.is_pawn_charge
                 self.is_en_passant = other.is_en_passant
                 self.is_promotion = other.is_promotion
+                print(other.is_roque)
                 self.is_roque = other.is_roque
                 return True
         return False

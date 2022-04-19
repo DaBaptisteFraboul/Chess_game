@@ -51,7 +51,7 @@ class Application :
         # chess Ai
 
         self.computer_move = None
-        self.game = Menus.ChessGame(self.window, 'black')
+        self.game = Menus.ChessGame(self.window, 'white')
 
 
 

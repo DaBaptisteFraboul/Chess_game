@@ -194,15 +194,67 @@ class PauseMenu(Menu):
 class ChessGame(Menu) :
     def __init__(self, screen, player_color ):
         super().__init__(screen)
-        self.reset_button = Button(592,164, "assets/GUI/button_pressed.png",17)
-        self.reset_button.scale_button(32,64)
+        self.reset_button = Button(604,144, "assets/GUI/Restart_button.png",17)
+        self.reset_button.scale_button(56, 72)
+
+        self.undo_button = Button(596, 210, "assets/GUI/LastMove_button.png", 17)
+        self.undo_button.scale_button(48, 88 )
+
         self.quit_boutton = Button(652,8,"assets/GUI/Quit_button.png",17)
         self.quit_boutton.scale_button(44,40)
+
+        self.useless_button_1 = Button(596,270, "assets/GUI/Big_Green_button.png", 17)
+        self.useless_button_1.scale_button(48, 88)
+
+        self.useless_button_2 = Button(594,328,"assets/GUI/Small_Green_button.png", 17)
+        self.useless_button_2.scale_button(48, 44)
+
+        self.useless_button_3 = Button(644, 328, "assets/GUI/Small_Red_button.png", 17)
+        self.useless_button_3.scale_button(48,44)
+
+        self.useless_button_4 = Button(594, 384, "assets/GUI/Small_Green_button.png", 17)
+        self.useless_button_4.scale_button(48, 44)
+
+        self.useless_button_5 = Button(644, 384, "assets/GUI/Small_Red_button.png", 17)
+        self.useless_button_5.scale_button(48, 44)
+
+        self.useless_button_6 = Button(594, 440, "assets/GUI/Small_Green_button.png", 17)
+        self.useless_button_6.scale_button(48, 44)
+
+        self.useless_button_7 = Button(644, 440, "assets/GUI/Small_Green_button.png", 17)
+        self.useless_button_7.scale_button(48, 44)
+
+        self.useless_button_8 = Button(594, 496, "assets/GUI/Small_Green_button.png", 17)
+        self.useless_button_8.scale_button(48, 44)
+
+        self.useless_button_9 = Button(644, 496, "assets/GUI/Small_Green_button.png", 17)
+        self.useless_button_9.scale_button(48, 44)
+
+        self.useless_button_10 = Button(594, 552, "assets/GUI/Small_Green_button.png", 17)
+        self.useless_button_10.scale_button(48, 44)
+
+        self.useless_button_11 = Button(644, 552, "assets/GUI/Small_Green_button.png", 17)
+        self.useless_button_11.scale_button(48, 44)
+
+        self.useless_button_12 = Button(594, 608, "assets/GUI/Small_Green_button.png", 17)
+        self.useless_button_12.scale_button(48, 44)
+
+        self.useless_button_13 = Button(644, 608, "assets/GUI/Small_Green_button.png", 17)
+        self.useless_button_13.scale_button(48, 44)
+
+        self.useless_button_14 = Button(594,668, "assets/GUI/Small_Green_button.png", 17)
+        self.useless_button_14.scale_button(48, 44)
+
+        self.useless_button_15 = Button(644, 668, "assets/GUI/Small_Green_button.png", 17)
+        self.useless_button_15.scale_button(48, 44)
+
         self.player_color = player_color
         self.board = chess_engine.ChessBoard()
         self.board.set_starting_position()
-        self.color_switch = Gui.SwitchButton(588,72, "assets/GUI/Black_switch.png",24,True)
-        self.color_switch.scale_button(44,104)
+
+        self.color_switch = Gui.SwitchButton(588,72, "assets/GUI/Black_switch.png",24,False)
+        self.color_switch.scale_button(44 ,104)
+
         self.left_ui = pygame.image.load('assets/board/export/Left_UI.png')
         self.left_ui = pygame.transform.scale(self.left_ui, (64,768))
         self.right_ui = pygame.image.load('assets/board/export/Right_Ui.png')
@@ -249,7 +301,7 @@ class ChessGame(Menu) :
 
                 self.endgame_menu.run()
                 self.board.set_starting_position()
-                print(self.board.board)
+
 
                 print("Chekmate" + self.board.colour_to_play + " have lost the game")
             if self.board.pat:
@@ -257,6 +309,7 @@ class ChessGame(Menu) :
         if rerun :
             self.board.set_starting_position()
             self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
+
     def handle_keyboard_events(self, event):
 
         if event.type == pygame.QUIT :
@@ -320,8 +373,6 @@ class ChessGame(Menu) :
                 print(self.is_running)
 
 
-
-
     def handle_click_event(self, event):
         """
         gestion des clics de la souris
@@ -341,8 +392,33 @@ class ChessGame(Menu) :
                 self.board.set_starting_position()
                 self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
                 self.selected_case = ()
+
             if self.quit_boutton.click_event(self.mx, self.my) :
                 print("Click Quit")
+            if self.undo_button.click_event(self.mx, self.my) :
+                if self.board.colour_to_play == self.player_color :
+                    self.board.Undo_Move(self.player_color)
+                    if self.god_mod:
+                        self.board.next_color()
+                    self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
+                else :
+                    print("wait computer move")
+
+            self.useless_button_1.click_event(self.mx,self.my)
+            self.useless_button_2.click_event(self.mx, self.my)
+            self.useless_button_3.click_event(self.mx, self.my)
+            self.useless_button_4.click_event(self.mx, self.my)
+            self.useless_button_5.click_event(self.mx, self.my)
+            self.useless_button_6.click_event(self.mx, self.my)
+            self.useless_button_7.click_event(self.mx, self.my)
+            self.useless_button_8.click_event(self.mx, self.my)
+            self.useless_button_9.click_event(self.mx, self.my)
+            self.useless_button_10.click_event(self.mx, self.my)
+            self.useless_button_11.click_event(self.mx, self.my)
+            self.useless_button_12.click_event(self.mx, self.my)
+            self.useless_button_13.click_event(self.mx, self.my)
+            self.useless_button_14.click_event(self.mx, self.my)
+            self.useless_button_15.click_event(self.mx, self.my)
 
             if self.color_switch.click_event(self.mx, self.my):
                 if self.board.side == 'white':
@@ -374,11 +450,12 @@ class ChessGame(Menu) :
                     if len(self.player_clicks) == 2:  # nous sommes après le deuxième clic
                         if self.board.get_piece_colour(self.player_clicks[0]) == self.board.colour_to_play:
                             move = chess_engine.Move(self.player_clicks[0], self.player_clicks[1], self.board.board)
-                            #if self.board.get_piece_type(self.player_clicks[0]) == 'king' and \
-                                    #self.player_clicks[0][1] - self.player_clicks[1][1] != 1:
-                               # print(self.player_clicks[1][1] - self.player_clicks[0][1])
-                                #print("roque generated from click")
-                                #move.is_roque = True
+                            if self.board.get_piece_type(self.player_clicks[0]) == 'king' and \
+                                    self.player_clicks[0][1] - self.player_clicks[1][1] != 1:
+                                print(self.player_clicks[1][1] - self.player_clicks[0][1])
+                                print("roque generated from click")
+                                move.is_roque = True
+                            print(self.board.current_roques_autorisation.print_roques_availables())
                             if move in self.Valid_moves:
                                 self.board.Make_Move(move)
                                 self.move_made = True
@@ -423,6 +500,24 @@ class ChessGame(Menu) :
         self.board.draw_pieces(self.screen)
         self.reset_button.button_display(self.screen, self.dt)
         self.quit_boutton.button_display(self.screen, self.dt)
+        self.undo_button.button_display(self.screen, self.dt)
+        self.useless_button_1.button_display(self.screen, self.dt)
+        self.useless_button_2.button_display(self.screen, self.dt)
+        self.useless_button_3.button_display(self.screen, self.dt)
+        self.useless_button_4.button_display(self.screen, self.dt)
+        self.useless_button_5.button_display(self.screen, self.dt)
+        self.useless_button_6.button_display(self.screen, self.dt)
+        self.useless_button_7.button_display(self.screen, self.dt)
+        self.useless_button_8.button_display(self.screen, self.dt)
+        self.useless_button_9.button_display(self.screen, self.dt)
+        self.useless_button_10.button_display(self.screen, self.dt)
+        self.useless_button_11.button_display(self.screen, self.dt)
+        self.useless_button_12.button_display(self.screen, self.dt)
+        self.useless_button_13.button_display(self.screen, self.dt)
+        self.useless_button_14.button_display(self.screen, self.dt)
+        self.useless_button_15.button_display(self.screen, self.dt)
+
+
         if self.player_clicks != []:
             self.board.draw_moves(self.screen, self.Valid_moves, self.player_clicks[0])
             # On mettra ici le déclencheement de l'animation de victoire et du menu rejouer.
@@ -439,7 +534,6 @@ class ChessGame(Menu) :
             print("computer is playing")
             fen = self.board.get_FEN()
             self.computer_move = self.board.do_best_move(fen)
-            print(self.board.stockfish.get_board_visual())
 
         for events in pygame.event.get():
             self.handle_keyboard_events(events)

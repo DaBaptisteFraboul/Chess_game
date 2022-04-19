@@ -1,63 +1,80 @@
 { "frames": {
    "Right_UI 0.aseprite": {
-    "frame": { "x": 0, "y": 0, "w": 12, "h": 11 },
+    "frame": { "x": 0, "y": 0, "w": 26, "h": 11 },
     "rotated": false,
     "trimmed": true,
-    "spriteSourceSize": { "x": 3, "y": 18, "w": 12, "h": 11 },
+    "spriteSourceSize": { "x": 3, "y": 18, "w": 26, "h": 11 },
     "sourceSize": { "w": 32, "h": 192 },
     "duration": 100
    },
    "Right_UI 1.aseprite": {
-    "frame": { "x": 12, "y": 0, "w": 12, "h": 11 },
+    "frame": { "x": 26, "y": 0, "w": 26, "h": 11 },
     "rotated": false,
     "trimmed": true,
-    "spriteSourceSize": { "x": 3, "y": 18, "w": 12, "h": 11 },
+    "spriteSourceSize": { "x": 3, "y": 18, "w": 26, "h": 11 },
     "sourceSize": { "w": 32, "h": 192 },
     "duration": 100
    },
    "Right_UI 2.aseprite": {
-    "frame": { "x": 24, "y": 0, "w": 12, "h": 11 },
+    "frame": { "x": 52, "y": 0, "w": 26, "h": 11 },
     "rotated": false,
     "trimmed": true,
-    "spriteSourceSize": { "x": 3, "y": 18, "w": 12, "h": 11 },
+    "spriteSourceSize": { "x": 3, "y": 18, "w": 26, "h": 11 },
     "sourceSize": { "w": 32, "h": 192 },
     "duration": 100
    },
    "Right_UI 3.aseprite": {
-    "frame": { "x": 36, "y": 0, "w": 12, "h": 11 },
+    "frame": { "x": 78, "y": 0, "w": 26, "h": 11 },
     "rotated": false,
     "trimmed": true,
-    "spriteSourceSize": { "x": 3, "y": 18, "w": 12, "h": 11 },
+    "spriteSourceSize": { "x": 3, "y": 18, "w": 26, "h": 11 },
     "sourceSize": { "w": 32, "h": 192 },
     "duration": 100
    },
    "Right_UI 4.aseprite": {
-    "frame": { "x": 48, "y": 0, "w": 12, "h": 11 },
+    "frame": { "x": 104, "y": 0, "w": 26, "h": 11 },
     "rotated": false,
     "trimmed": true,
-    "spriteSourceSize": { "x": 3, "y": 18, "w": 12, "h": 11 },
+    "spriteSourceSize": { "x": 3, "y": 18, "w": 26, "h": 11 },
     "sourceSize": { "w": 32, "h": 192 },
     "duration": 100
    },
    "Right_UI 5.aseprite": {
-    "frame": { "x": 60, "y": 0, "w": 12, "h": 11 },
+    "frame": { "x": 130, "y": 0, "w": 26, "h": 11 },
     "rotated": false,
     "trimmed": true,
-    "spriteSourceSize": { "x": 3, "y": 18, "w": 12, "h": 11 },
+    "spriteSourceSize": { "x": 3, "y": 18, "w": 26, "h": 11 },
+    "sourceSize": { "w": 32, "h": 192 },
+    "duration": 100
+   },
+   "Right_UI 6.aseprite": {
+    "frame": { "x": 156, "y": 0, "w": 26, "h": 11 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 3, "y": 18, "w": 26, "h": 11 },
+    "sourceSize": { "w": 32, "h": 192 },
+    "duration": 100
+   },
+   "Right_UI 7.aseprite": {
+    "frame": { "x": 182, "y": 0, "w": 26, "h": 11 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 3, "y": 18, "w": 26, "h": 11 },
     "sourceSize": { "w": 32, "h": 192 },
     "duration": 100
    }
  },
  "meta": {
   "app": "http://www.aseprite.org/",
-  "version": "1.2.28-x64",
+  "version": "1.2.25-x64",
   "image": "Black_switch.png",
   "format": "RGBA8888",
-  "size": { "w": 72, "h": 11 },
+  "size": { "w": 208, "h": 11 },
   "scale": "1",
   "frameTags": [
   ],
   "layers": [
+   { "name": "Color_switchbutton", "opacity": 255, "blendMode": "normal" },
    { "name": "Color_switchbutton", "opacity": 255, "blendMode": "normal" },
    { "name": "Layer 3", "opacity": 255, "blendMode": "normal" }
   ],

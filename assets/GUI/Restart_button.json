@@ -1,0 +1,66 @@
+{ "frames": {
+   "Right_UI 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 18, "h": 14 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 7, "y": 34, "w": 18, "h": 14 },
+    "sourceSize": { "w": 32, "h": 192 },
+    "duration": 100
+   },
+   "Right_UI 1.aseprite": {
+    "frame": { "x": 18, "y": 0, "w": 18, "h": 14 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 7, "y": 34, "w": 18, "h": 14 },
+    "sourceSize": { "w": 32, "h": 192 },
+    "duration": 100
+   },
+   "Right_UI 2.aseprite": {
+    "frame": { "x": 36, "y": 0, "w": 18, "h": 14 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 7, "y": 34, "w": 18, "h": 14 },
+    "sourceSize": { "w": 32, "h": 192 },
+    "duration": 100
+   },
+   "Right_UI 3.aseprite": {
+    "frame": { "x": 54, "y": 0, "w": 18, "h": 14 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 7, "y": 34, "w": 18, "h": 14 },
+    "sourceSize": { "w": 32, "h": 192 },
+    "duration": 100
+   },
+   "Right_UI 4.aseprite": {
+    "frame": { "x": 72, "y": 0, "w": 18, "h": 14 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 7, "y": 34, "w": 18, "h": 14 },
+    "sourceSize": { "w": 32, "h": 192 },
+    "duration": 100
+   },
+   "Right_UI 5.aseprite": {
+    "frame": { "x": 90, "y": 0, "w": 18, "h": 14 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 7, "y": 34, "w": 18, "h": 14 },
+    "sourceSize": { "w": 32, "h": 192 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.25-x64",
+  "image": "Restart_button.png",
+  "format": "RGBA8888",
+  "size": { "w": 108, "h": 14 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "Restart Button", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

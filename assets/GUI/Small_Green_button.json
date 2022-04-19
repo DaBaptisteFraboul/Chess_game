@@ -1,0 +1,66 @@
+{ "frames": {
+   "Right_UI 0.aseprite": {
+    "frame": { "x": 0, "y": 0, "w": 11, "h": 12 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 17, "y": 98, "w": 11, "h": 12 },
+    "sourceSize": { "w": 32, "h": 192 },
+    "duration": 100
+   },
+   "Right_UI 1.aseprite": {
+    "frame": { "x": 11, "y": 0, "w": 11, "h": 12 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 17, "y": 98, "w": 11, "h": 12 },
+    "sourceSize": { "w": 32, "h": 192 },
+    "duration": 100
+   },
+   "Right_UI 2.aseprite": {
+    "frame": { "x": 22, "y": 0, "w": 11, "h": 12 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 17, "y": 98, "w": 11, "h": 12 },
+    "sourceSize": { "w": 32, "h": 192 },
+    "duration": 100
+   },
+   "Right_UI 3.aseprite": {
+    "frame": { "x": 33, "y": 0, "w": 11, "h": 12 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 17, "y": 98, "w": 11, "h": 12 },
+    "sourceSize": { "w": 32, "h": 192 },
+    "duration": 100
+   },
+   "Right_UI 4.aseprite": {
+    "frame": { "x": 44, "y": 0, "w": 11, "h": 12 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 17, "y": 98, "w": 11, "h": 12 },
+    "sourceSize": { "w": 32, "h": 192 },
+    "duration": 100
+   },
+   "Right_UI 5.aseprite": {
+    "frame": { "x": 55, "y": 0, "w": 11, "h": 12 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 17, "y": 98, "w": 11, "h": 12 },
+    "sourceSize": { "w": 32, "h": 192 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.25-x64",
+  "image": "Small_Green_button.png",
+  "format": "RGBA8888",
+  "size": { "w": 66, "h": 12 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "Small_green_button", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

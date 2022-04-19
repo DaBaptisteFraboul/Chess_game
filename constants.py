@@ -153,7 +153,8 @@ def quit_game():
 Images = load_pieces_images()
 
 image_overlay = pygame.image.load("assets/board/export/valid_move_text.png")
-
+image_attack = pygame.image.load("assets/board/export/Attack_move.png")
+image_attack = pygame.transform.scale(image_attack, (64,64))
 board_offset = (64, 128)
 
 board_position = (576, 640)
