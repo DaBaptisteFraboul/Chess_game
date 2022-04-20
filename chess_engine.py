@@ -53,7 +53,7 @@ class ChessBoard:
 
 
         self.stockfish = sf.Stockfish(path="stockfish_14.1_win_x64_popcnt/stockfish_14.1_win_x64_popcnt.exe")
-        self.stockfish.set_skill_level(1)
+        self.stockfish.set_skill_level(0)
 
     def next_color(self):
         if self.colour_to_play == "white":
@@ -87,14 +87,23 @@ class ChessBoard:
             if move.start_row == square[0] and move.start_col == square[1] and \
                     [move.start_row, move.start_col] != [move.end_row, move.end_col]:
                 if self.side == 'white' :
-                    if move.captured_piece != 'EmptySquare' :
+                    if move.is_roque :
+                        screen.blit(constants.image_roque, pygame.Rect(move.end_col * 64 + constants.board_offset[0],
+                                                                        move.end_row * 64 + constants.board_offset[1],
+                                                                        64, 64))
+                    elif move.captured_piece != 'EmptySquare' :
                         screen.blit(constants.image_attack, pygame.Rect(move.end_col * 64 + constants.board_offset[0],
                                                                  move.end_row * 64 + constants.board_offset[1], 64, 64))
                     else :
                         screen.blit(constants.image_overlay, pygame.Rect(move.end_col * 64 + constants.board_offset[0],
                                                                      move.end_row * 64 + constants.board_offset[1], 64, 64))
                 if self.side =='black' :
-                    if move.captured_piece != 'EmptySquare' :
+                    if move.is_roque :
+                        screen.blit(constants.image_roque,
+                                    pygame.Rect(constants.turn_board[move.end_col] * 64 + constants.board_offset[0],
+                                                constants.turn_board[move.end_row] * 64 + constants.board_offset[1], 64,
+                                                64))
+                    elif move.captured_piece != 'EmptySquare' :
                         screen.blit(constants.image_attack, pygame.Rect(constants.turn_board[move.end_col] * 64 + constants.board_offset[0],
                                                 constants.turn_board[move.end_row] * 64 + constants.board_offset[1], 64, 64))
                     else :
@@ -637,6 +646,7 @@ class ChessBoard:
                     if  (not self.square_under_attack(r,c + 2, self.colour_to_play) and
                            not self.square_under_attack(r,c + 1,self.colour_to_play)):
                         petit_roque = Move([r, c], [r, c + 2], self.board, is_roque= True)
+                        moves.append(petit_roque)
 
             else :
                 pass

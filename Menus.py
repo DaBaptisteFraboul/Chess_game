@@ -275,7 +275,7 @@ class ChessGame(Menu) :
         self.pause_bg = None
 
         self.pause = PauseMenu(self.screen, self.pause_bg)
-        self.endgame_menu = EndgameMenu(self.screen)
+        self.endgame_menu = EndgameMenu(self.screen, self.pause_bg)
 
         # variable used to avoid to recalculate moves every frames
 
@@ -295,9 +295,16 @@ class ChessGame(Menu) :
     def update(self):
         rerun = False
         if self.board.checkmate or self.board.pat:
+            self.display()
+            pygame.image.save(self.screen, "pause_screen.png")
+            self.pause_bg = pygame.image.load("pause_screen.png")
+            self.endgame_menu = EndgameMenu(self.screen, self.pause_bg)
             if self.board.checkmate:
                 if self.board.colour_to_play == self.player_color:
-                    rerun = self.endgame_menu.player_lost = True
+                    self.endgame_menu.player_lost = True
+                else :
+                    self.endgame_menu.player_lost = False
+                rerun = self.endgame_menu.player_lost
 
                 self.endgame_menu.run()
                 self.board.set_starting_position()
@@ -364,14 +371,13 @@ class ChessGame(Menu) :
             if event.key == pygame.K_b :
                 print(self.board.board)
 
-            if event.key == pygame.K_p :
+            if event.key == pygame.K_ESCAPE :
                 pygame.image.save(self.screen,"pause_screen.png")
                 self.pause_bg = pygame.image.load("pause_screen.png")
                 self.pause = PauseMenu(self.screen, self.pause_bg)
                 self.pause.is_running = True
                 self.pause.run()
                 print(self.is_running)
-
 
     def handle_click_event(self, event):
         """
@@ -481,7 +487,6 @@ class ChessGame(Menu) :
                     self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
                     self.move_made = False
 
-
     def display(self):
         """
         Gère l'affichage des éléments à l'écran, notez bien que l'ordre des méthodes correspond à l'ordre des calques :
@@ -565,15 +570,21 @@ class PauseOptionsMenu(Menu):
         super().__init__(screen)
 
 class EndgameMenu(Menu):
-    def __init__(self, screen):
+    def __init__(self, screen, end_bg):
         super().__init__(screen)
         self.player_lost = None
+        self.end_bg = end_bg
+        self.font = pygame.font.Font("assets/Retro Gaming.ttf",24)
 
     def handle_keyboard_events(self, event):
         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE :
+                self.is_running = False
+
             if event.key == pygame.K_SPACE:
                 self.is_running = False
                 return True
+
 
     def handle_click_event(self, event):
         pass
@@ -581,12 +592,22 @@ class EndgameMenu(Menu):
     def update(self):
         pass
 
+    def events(self):
+        for events in pygame.event.get():
+            if events.type == pygame.QUIT :
+                constants.quit_game()
+                constants.quit = True
+            self.handle_click_event(events)
+            self.handle_keyboard_events(events)
 
     def display(self):
+        self.screen.blit(self.end_bg, (0,0))
         if self.player_lost :
-            self.screen.fill((178,20,20,120))
+            self.text = self.font.render("You lost the game",True,(240,25,25))
+            self.screen.blit(self.text, (200,200))
         else :
-            self.screen.fill((20,20,178,120))
+            self.text = self.font.render("You won the game", True, (240, 25, 25))
+            self.screen.blit(self.text, (200, 200))
         pygame.display.flip()
 
     def run(self):
