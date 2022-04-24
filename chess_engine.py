@@ -484,6 +484,8 @@ class ChessBoard:
                 pass
         return False
 
+
+
     def get_Valid_moves(self, colour):
         '''
         Valid move est la méthode de génération des moves définitifs, elle sert de relation entre la méthode naive de génération
@@ -549,6 +551,40 @@ class ChessBoard:
 
     # cet algorithme plus élégant ne recalcule plus tous le coups de l'adversaire pour voir si le roi est en echecs en traquant sa position
     # mais il part de la position du roi pour savoir si une pièce ennemi peut l'attaquer
+    def draw_pinned_moves(self, screen, colour):
+        incheck, clouages, checks  = self.check_for_pins_and_checks(colour)
+        for pins in clouages :
+            if self.side == "white":
+                rect = pygame.Rect(pins[1] * 64 + constants.board_offset[0],
+                                   pins[0] * 64 + constants.board_offset[1],
+                                   64,
+                                   64)
+
+                screen.blit(constants.image_pin, rect)
+            elif self.side == 'black':
+                rect = pygame.Rect(constants.turn_board[pins[1]] * 64 + constants.board_offset[0],
+                                   constants.turn_board[pins[0]] * 64 + constants.board_offset[1],
+                                   64,
+                                   64)
+                screen.blit(constants.image_pin, rect)
+        if incheck :
+            for echecs in checks :
+                check_square = (echecs[0], echecs[1])
+                direction = (echecs[2], echecs[3])
+                if self.side == "white":
+                    rect = pygame.Rect(echecs[1] * 64 + constants.board_offset[0],
+                                       echecs[0] * 64 + constants.board_offset[1],
+                                       64,
+                                       64)
+
+                    screen.blit(constants.image_check, rect)
+                elif self.side == 'black':
+                    rect = pygame.Rect(constants.turn_board[echecs[1]] * 64 + constants.board_offset[0],
+                                       constants.turn_board[echecs[0]] * 64 + constants.board_offset[1],
+                                       64,
+                                       64)
+                    screen.blit(constants.image_check, rect)
+
 
     def check_for_pins_and_checks(self, colour):
         clouage = []  # contient les cases clouées par l'adversaire

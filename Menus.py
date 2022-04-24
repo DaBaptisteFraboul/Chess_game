@@ -1,5 +1,5 @@
 import pygame
-
+import datetime
 import Gui
 import chess_globals_variable
 import constants
@@ -265,7 +265,7 @@ class ChessGame(Menu) :
         self.board_ui = pygame.transform.scale(self.board_ui, (512,512))
         self.right_ui_pos = (576,0)
         self.god_mod = False
-
+        self.deactivate_CPU = False
         self.Valid_moves = self.board.get_Valid_moves(self.board.colour_to_play)
         self.move_made = False
 
@@ -273,6 +273,7 @@ class ChessGame(Menu) :
         self.selected_case = ()
         self.computer_move = None
         self.pause_bg = None
+        self.draw_pins = False
 
         self.pause = PauseMenu(self.screen, self.pause_bg)
         self.endgame_menu = EndgameMenu(self.screen, self.pause_bg)
@@ -410,10 +411,32 @@ class ChessGame(Menu) :
                 else :
                     print("wait computer move")
 
-            self.useless_button_1.click_event(self.mx,self.my)
-            self.useless_button_2.click_event(self.mx, self.my)
-            self.useless_button_3.click_event(self.mx, self.my)
-            self.useless_button_4.click_event(self.mx, self.my)
+            if self.useless_button_1.click_event(self.mx,self.my) :
+                if self.draw_pins :
+                    self.draw_pins = False
+                    return
+                else :
+                    self.draw_pins = True
+
+            if self.useless_button_2.click_event(self.mx, self.my) :
+                for moves in self.Valid_moves :
+                    start_square = (moves.start_row, moves.start_col)
+                    end_square = (moves.end_row, moves.end_col)
+                    print("--------------------")
+                    print("Move is : {} , {}".format(start_square,end_square))
+            if self.useless_button_3.click_event(self.mx, self.my) :
+                if not self.deactivate_CPU:
+                    self.deactivate_CPU = True
+                    print("Stockfish_deactivated")
+                    return
+                else :
+                    print("Activate_Stockfish")
+                    self.deactivate_CPU = False
+            if self.useless_button_4.click_event(self.mx, self.my) :
+                date = datetime.datetime.now()
+                filename = "chess_game_{}.png".format("%s_%s_%s"%(date.hour, date.minute, date.second))
+                location = "screenshots/" + filename
+                pygame.image.save(self.screen,location)
             self.useless_button_5.click_event(self.mx, self.my)
             self.useless_button_6.click_event(self.mx, self.my)
             self.useless_button_7.click_event(self.mx, self.my)
@@ -434,11 +457,10 @@ class ChessGame(Menu) :
                     self.board.side = 'white'
 
 
-            if self.is_inside_board(self.mx, self.my) and self.board.colour_to_play == self.player_color:
+            if self.is_inside_board(self.mx, self.my) and (self.board.colour_to_play == self.player_color or self.deactivate_CPU):
                 if event.button == 1:
                     location = ((self.my - 128) // 64,
-                                (
-                                            self.mx - 64) // 64)  # on récupère la position du clic sur le board (attention il faut inverser c et r)
+                                (self.mx - 64) // 64)  # on récupère la position du clic sur le board (attention il faut inverser c et r)
                     if self.board.side == 'white':
                         row = location[0]
                         col = location[1]
@@ -457,8 +479,10 @@ class ChessGame(Menu) :
                         if self.board.get_piece_colour(self.player_clicks[0]) == self.board.colour_to_play:
                             move = chess_engine.Move(self.player_clicks[0], self.player_clicks[1], self.board.board)
                             if self.board.get_piece_type(self.player_clicks[0]) == 'king' and \
-                                    self.player_clicks[0][1] - self.player_clicks[1][1] != 1:
-                                print(self.player_clicks[1][1] - self.player_clicks[0][1])
+                                    (self.player_clicks[0][1] - self.player_clicks[1][1] != 1 and \
+                                    self.player_clicks[0][1] - self.player_clicks[1][1] != (-1)):
+                                print("{} case moves for king".format(self.player_clicks[0][1] - self.player_clicks[1][1]))
+
                                 print("roque generated from click")
                                 move.is_roque = True
                             print(self.board.current_roques_autorisation.print_roques_availables())
@@ -499,7 +523,8 @@ class ChessGame(Menu) :
         self.screen.blit(self.screen_ui, (64,0))
         self.screen.blit(self.screen_ui, (64,640))
         self.board.draw_board(self.screen)
-
+        if self.draw_pins :
+            self.board.draw_pinned_moves(self.screen, self.board.colour_to_play)
 
         self.color_switch.button_display(self.screen, self.dt)
         self.board.draw_pieces(self.screen)
@@ -521,7 +546,8 @@ class ChessGame(Menu) :
         self.useless_button_13.button_display(self.screen, self.dt)
         self.useless_button_14.button_display(self.screen, self.dt)
         self.useless_button_15.button_display(self.screen, self.dt)
-
+        if self.draw_pins:
+            self.board.draw_pinned_moves(self.screen, self.board.colour_to_play)
 
         if self.player_clicks != []:
             self.board.draw_moves(self.screen, self.Valid_moves, self.player_clicks[0])
@@ -535,7 +561,7 @@ class ChessGame(Menu) :
         pygame.display.flip()
 
     def events(self):
-        if self.board.colour_to_play != self.player_color :
+        if self.board.colour_to_play != self.player_color and self.deactivate_CPU == False :
             print("computer is playing")
             fen = self.board.get_FEN()
             self.computer_move = self.board.do_best_move(fen)
