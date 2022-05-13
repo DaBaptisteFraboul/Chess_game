@@ -478,11 +478,15 @@ class ChessGame(Menu) :
                     if len(self.player_clicks) == 2:  # nous sommes après le deuxième clic
                         if self.board.get_piece_colour(self.player_clicks[0]) == self.board.colour_to_play:
                             move = chess_engine.Move(self.player_clicks[0], self.player_clicks[1], self.board.board)
+                            print(self.player_clicks)
                             if self.board.get_piece_type(self.player_clicks[0]) == 'king' and \
-                                    (self.player_clicks[0][1] - self.player_clicks[1][1] != 1 and \
-                                    self.player_clicks[0][1] - self.player_clicks[1][1] != (-1)):
-                                print("{} case moves for king".format(self.player_clicks[0][1] - self.player_clicks[1][1]))
-
+                                    (self.player_clicks[0][1] - self.player_clicks[1][1] != 1 and
+                                    self.player_clicks[0][1] - self.player_clicks[1][1] != (-1) and \
+                                    self.player_clicks[0][1] - self.player_clicks[1][1] != 0):
+                                print("test 1 : {}".format(self.player_clicks[0][1] - self.player_clicks[1][1] != -1))
+                                print("test 2 : {}".format(self.player_clicks[0][1] - self.player_clicks[1][1] != 1))
+                                print("test 3 : {}".format(self.player_clicks[0][1] - self.player_clicks[1][1] != 0))
+                                print(self.player_clicks[0][1] - self.player_clicks[1][1])
                                 print("roque generated from click")
                                 move.is_roque = True
                             print(self.board.current_roques_autorisation.print_roques_availables())

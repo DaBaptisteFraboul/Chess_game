@@ -100,6 +100,7 @@ class Animation:
             if not forward :
                 self.draw_frame(screen, rect)
                 self.update_index_backwardd(dt)
-
+        else :
+            self.draw_frame(screen, rect)
 
 

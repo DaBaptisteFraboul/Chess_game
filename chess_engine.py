@@ -670,16 +670,16 @@ class ChessBoard:
         if self.inCheck:
             return
         if colour == 'white':
-            if self.current_roques_autorisation.white_grand_roque:
+            if self.current_roques_autorisation.white_grand_roque :
                 if self.board[r][c - 1] == 'EmptySquare' and self.board[r][c - 2] == 'EmptySquare':
                     if not (self.square_under_attack(r, c - 2, self.colour_to_play) or
                             self.square_under_attack(r, c -1 , self.colour_to_play)):
                         grand_roque = Move([r, c], [r, c - 2], self.board, is_roque= True)
                         moves.append(grand_roque)
                         print("move added")
-            if self.current_roques_autorisation.white_petit_roque:
+            if self.current_roques_autorisation.white_petit_roque :
                 if self.board[r][c + 1] == 'EmptySquare' and self.board[r][c + 2] == 'EmptySquare':
-                    if  (not self.square_under_attack(r,c + 2, self.colour_to_play) and
+                    if (not self.square_under_attack(r,c + 2, self.colour_to_play) and
                            not self.square_under_attack(r,c + 1,self.colour_to_play)):
                         petit_roque = Move([r, c], [r, c + 2], self.board, is_roque= True)
                         moves.append(petit_roque)
@@ -1159,7 +1159,6 @@ class Move:
                 self.is_pawn_charge = other.is_pawn_charge
                 self.is_en_passant = other.is_en_passant
                 self.is_promotion = other.is_promotion
-                print(other.is_roque)
                 self.is_roque = other.is_roque
                 return True
         return False
